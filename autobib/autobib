@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python -m autobib "$@"
+python3 -m autobib "$@"

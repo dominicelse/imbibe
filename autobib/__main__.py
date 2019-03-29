@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import arxiv
 import sys
 import habanero
@@ -21,7 +20,7 @@ def populate_arxiv_information(list_of_bibitems):
             try:
                 results[i] = arxiv.query(id_list=arxiv_ids[i])[0]
             except Exception as ee:
-                print >>sys.stderr, "arXiv ID not found (or other error): " + arxiv_ids[i]
+                print("arXiv ID not found (or other error): " + arxiv_ids[i], file=sys.stderr)
                 raise ee
 
     if len(results) != len(arxiv_ids):
@@ -172,9 +171,21 @@ class BibItem(object):
         self.page = cr_result['article-number']
 
 if __name__ == '__main__':
-    f = open(sys.argv[1])
-    bibitems = [ BibItem.init_from_input_file_line(line) for line in f.readlines() ]
-    populate_arxiv_information(bibitems)
-    populate_doi_information(bibitems)
-    for bibitem in bibitems:
-        bibitem.output_bib()
+    arg = sys.argv[1]
+    if arg == '--help':
+        print("autobib <input_file>", file=sys.stderr)
+        print("autobib --arxiv <arxiv_id>", file=sys.stderr)
+        print("autobib --doi <doi>", file=sys.stderr)
+    else:
+        if arg == '--arxiv':
+            bibitems = [ BibItem(arxivid=sys.argv[2]) ]
+        elif arg == '--doi':
+            bibitems = [ BibItem(doi=sys.argv[2]) ]
+        else:
+            f = open(arg)
+            bibitems = [ BibItem.init_from_input_file_line(line) for line in f.readlines() ]
+
+        populate_arxiv_information(bibitems)
+        populate_doi_information(bibitems)
+        for bibitem in bibitems:
+            bibitem.output_bib()
