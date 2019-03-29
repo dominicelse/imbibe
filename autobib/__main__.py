@@ -171,12 +171,12 @@ class BibItem(object):
         self.page = cr_result['article-number']
 
 if __name__ == '__main__':
-    arg = sys.argv[1]
-    if arg == '--help':
+    if len(sys.argv) < 2 or sys.argv[1] == '--help':
         print("autobib <input_file>", file=sys.stderr)
         print("autobib --arxiv <arxiv_id>", file=sys.stderr)
         print("autobib --doi <doi>", file=sys.stderr)
     else:
+        arg = sys.argv[1]
         if arg == '--arxiv':
             bibitems = [ BibItem(arxivid=sys.argv[2]) ]
         elif arg == '--doi':
