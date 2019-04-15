@@ -161,14 +161,21 @@ class BibItem(object):
             self.doi = arxivresult['doi']
 
     def read_journal_information(self,cr_result):
-        cr_result = cr_result['message']
-        self.detailed_authors = cr_result['author']
-        self.authors = [ format_author(auth) for auth in self.detailed_authors ]
-        self.journal_short = cr_result['short-container-title'][0]
-        self.journal = cr_result['container-title'][0]
-        self.year = cr_result['created']['date-parts'][0][0]
-        self.volume = cr_result['volume']
-        self.page = cr_result['article-number']
+        try:
+            cr_result = cr_result['message']
+            self.detailed_authors = cr_result['author']
+            self.authors = [ format_author(auth) for auth in self.detailed_authors ]
+            self.journal_short = cr_result['short-container-title'][0]
+            self.journal = cr_result['container-title'][0]
+            self.year = cr_result['created']['date-parts'][0][0]
+            self.volume = cr_result['volume']
+            try:
+                self.page = cr_result['article-number']
+            except KeyError:
+                self.page = cr_result['page'].split('-')[0]
+        except KeyError:
+            print(cr_result)
+            raise
 
 if __name__ == '__main__':
     if len(sys.argv) < 2 or sys.argv[1] == '--help':
