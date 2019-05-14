@@ -5,3 +5,24 @@ Run:
 > pip3 install arxiv habanero
 copy autobib/ to somewhere in $PYTHONPATH
 copy autobib/autobib to somewhere in $PATH and make it executable
+
+Syntax for the input files:
+
+Each line should be of one of the following forms
+xxxx.yyyyy
+xxxx.yyyyy [opt1=value, opt2=value, ...]
+doi:zzzzz
+doi:zzzzz [opt1=value, opt2=value, ...]
+
+Where xxxx.yyyyy is an arxiv ID.
+    (can also be an old-style ID like "cond-mat/xxxxxx")
+doi:zzzzz is a DOI.
+You can specify the following options in the [...]:
+    doi=zzzzz
+       If you specified an arXiv ID, but the DOI linked to it on arXiv is
+       incorrect or not present.
+    bibtex_id=theidyouwant
+       If you want to override the default BibTeX ID which autobib generates.
+       Note that for the moment autobib only generates a default ID if you
+       specify the paper by arXiv ID. If you specify by DOI then you must use
+       this option to set the BibTeX ID.
