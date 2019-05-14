@@ -8,7 +8,7 @@ def populate_arxiv_information(list_of_bibitems):
     arxiv_ids = [ b.arxivid for b in bibitems_with_arxivid ]
 
     try:
-        results = arxiv.query(id_list=arxiv_ids)
+        results = arxiv.query(id_list=arxiv_ids, max_results=len(arxiv_ids))
     except Exception as e:
         if e.args[0] != 'HTTP Error 400 in query':
             raise e
