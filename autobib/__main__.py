@@ -55,7 +55,7 @@ def format_authorlist(l):
 def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
     if "/" in arxivid:
         # Old style arxiv id.
-        yymm = arxivid.split('/')[0:4]
+        yymm = arxivid.split('/')[1][0:4]
     else:
         # New style arxiv id.
         yymm = arxivid.split(".")[0]
