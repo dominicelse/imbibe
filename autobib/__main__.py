@@ -77,6 +77,7 @@ class BibItem(object):
         self.journal = None
         self.detailed_authors = None
         self.bibtex_id = None
+        self.abstract = None
 
     @staticmethod
     def init_from_input_file_line(line):
@@ -115,6 +116,12 @@ class BibItem(object):
         return bibitem
 
     def generate_bibtexid(self):
+        if self.arxivid is None:
+            if self.bibtex_id is None:
+                raise ValueError("For papers not referenced by arXiv ID, you have to" +
+                                  "manually specify a BibTeX ID.")
+            else:
+                return self.bibtex_id
         return make_bibtexid_from_arxivid(self.first_author_lastname(), self.arxivid)
 
     def first_author_lastname(self):
@@ -133,17 +140,24 @@ class BibItem(object):
         return hash(self.canonical_id)
 
     def output_bib(self):
+        if self.bibtex_id is not None:
+            bibtex_id = self.bibtex_id
+        else:
+            bibtex_id = self.generate_bibtexid()
+
         print("@article{" + self.generate_bibtexid() + ",")
+        if self.abstract is not None:
+            print("  abstract={" + self.abstract + "},")
+        if self.arxivid is not None:
+            print("  archiveprefix={arXiv},")
+            print("  eprint={" + self.arxivid + "},")
         if self.journal is not None:
             print("  journal={" + self.journal_short + "},")
             print("  volume={" + self.volume + "},")
             print("  pages={" + self.page + "},")
             print("  year={" + str(self.year) + "},")
         print("  title={" + self.title + "},")
-        print("  author={" + format_authorlist(self.authors) + "},")
-        print("  abstract={" + self.abstract + "},")
-        print("  archiveprefix={arXiv},")
-        print("  eprint={" + self.arxivid + "}")
+        print("  author={" + format_authorlist(self.authors) + "}")
         print("}")
 
     def read_arxiv_information(self,arxivresult):
@@ -169,6 +183,7 @@ class BibItem(object):
             self.journal = cr_result['container-title'][0]
             self.year = cr_result['created']['date-parts'][0][0]
             self.volume = cr_result['volume']
+            self.title = cr_result['title'][0]
             try:
                 self.page = cr_result['article-number']
             except KeyError:
