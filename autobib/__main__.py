@@ -156,6 +156,8 @@ class BibItem(object):
             print("  volume={" + self.volume + "},")
             print("  pages={" + self.page + "},")
             print("  year={" + str(self.year) + "},")
+        if self.doi is not None:
+            print("  doi={" + self.doi + "},")
         print("  title={" + self.title + "},")
         print("  author={" + format_authorlist(self.authors) + "}")
         print("}")
