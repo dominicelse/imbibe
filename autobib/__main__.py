@@ -2,10 +2,15 @@ import arxiv
 import sys
 import habanero
 import re
+import pickle
 
 def populate_arxiv_information(list_of_bibitems):
-    bibitems_with_arxivid = [ b for b in list_of_bibitems if b.arxivid is not None ]
+    bibitems_with_arxivid = [ b for b in list_of_bibitems if
+            (b.arxivid is not None and not b.arxiv_populated) ]
     arxiv_ids = [ b.arxivid for b in bibitems_with_arxivid ]
+
+    if len(arxiv_ids) == 0:
+        return
 
     try:
         results = arxiv.query(id_list=arxiv_ids, max_results=len(arxiv_ids))
@@ -31,8 +36,11 @@ def populate_arxiv_information(list_of_bibitems):
 
 
 def populate_doi_information(list_of_bibitems):
-    bibitems_with_doi = [ b for b in list_of_bibitems if b.doi is not None ]
+    bibitems_with_doi = [ b for b in list_of_bibitems if (b.doi is not None and
+        not b.doi_populated) ]
     dois = [ b.doi for b in bibitems_with_doi ]
+    if len(dois) == 0:
+        return
 
     cr = habanero.Crossref()
     results = cr.works(ids=dois)
@@ -63,6 +71,8 @@ def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
     return firstauthorlastname + "_" + yymm
 
 class BibItem(object):
+    cache = {}
+
     def __init__(self, arxivid=None, doi=None):
         if arxivid is None and doi is None:
             raise ValueError("Need to specify either arXiv ID or DOI!")
@@ -79,8 +89,27 @@ class BibItem(object):
         self.bibtex_id = None
         self.abstract = None
 
+        self.arxiv_populated = False
+        self.doi_populated = False
+
+    @staticmethod
+    def load_cache(filename):
+        try:
+            with open(filename, 'rb') as f:
+                BibItem.cache = pickle.load(f)
+        except FileNotFoundError:
+            print("Warning: cache file not found.", sys.stderr)
+
+    @staticmethod
+    def save_cache(filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(BibItem.cache, f)
+
     @staticmethod
     def init_from_input_file_line(line):
+        if line in BibItem.cache:
+            return BibItem.cache[line]
+
         splitline = re.split('\[|\]', line)
         main = splitline[0]
         doi = None
@@ -113,6 +142,7 @@ class BibItem(object):
         bibitem = BibItem(arxivid, doi)
         bibitem.bibtex_id = bibtex_id
 
+        BibItem.cache[line] = bibitem
         return bibitem
 
     def generate_bibtexid(self):
@@ -176,6 +206,8 @@ class BibItem(object):
         elif arxivresult['doi'] is not None:
             self.doi = arxivresult['doi']
 
+        self.arxiv_populated = True
+
     def read_journal_information(self,cr_result):
         try:
             cr_result = cr_result['message']
@@ -190,6 +222,8 @@ class BibItem(object):
                 self.page = cr_result['article-number']
             except KeyError:
                 self.page = cr_result['page'].split('-')[0]
+
+            self.doi_populated = True
         except KeyError:
             print(cr_result)
             raise
@@ -201,6 +235,11 @@ if __name__ == '__main__':
         print("autobib --doi <doi>", file=sys.stderr)
     else:
         arg = sys.argv[1]
+
+        cache_filename = "autobib-cache.pkl"
+
+        BibItem.load_cache(cache_filename)
+
         if arg == '--arxiv':
             bibitems = [ BibItem(arxivid=sys.argv[2]) ]
         elif arg == '--doi':
@@ -213,3 +252,5 @@ if __name__ == '__main__':
         populate_doi_information(bibitems)
         for bibitem in bibitems:
             bibitem.output_bib()
+
+        BibItem.save_cache(cache_filename)
