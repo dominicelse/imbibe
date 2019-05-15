@@ -215,7 +215,7 @@ class BibItem(object):
             self.authors = [ format_author(auth) for auth in self.detailed_authors ]
             self.journal_short = cr_result['short-container-title'][0]
             self.journal = cr_result['container-title'][0]
-            self.year = cr_result['created']['date-parts'][0][0]
+            self.year = cr_result['issued']['date-parts'][0][0]
             self.volume = cr_result['volume']
             self.title = cr_result['title'][0]
             try:
