@@ -3,8 +3,8 @@ To install on Linux (probably works on Mac too):
 Install python3
 Run:
 $ pip3 install arxiv habanero
-copy autobib/ to somewhere in $PYTHONPATH
-copy autobib/autobib to somewhere in $PATH and make it executable
+copy imbibe/ to somewhere in $PYTHONPATH
+copy imbibe/imbibe to somewhere in $PATH and make it executable
 
 Syntax for the input files:
 
@@ -22,7 +22,7 @@ You can specify the following options in the [...]:
        If you specified an arXiv ID, but the DOI linked to it on arXiv is
        incorrect or not present.
     bibtex_id=theidyouwant
-       If you want to override the default BibTeX ID which autobib generates.
-       Note that for the moment autobib only generates a default ID if you
+       If you want to override the default BibTeX ID which imbibe generates.
+       Note that for the moment imbibe only generates a default ID if you
        specify the paper by arXiv ID. If you specify by DOI then you must use
        this option to set the BibTeX ID.
