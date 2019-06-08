@@ -230,13 +230,13 @@ class BibItem(object):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2 or sys.argv[1] == '--help':
-        print("autobib <input_file>", file=sys.stderr)
-        print("autobib --arxiv <arxiv_id>", file=sys.stderr)
-        print("autobib --doi <doi>", file=sys.stderr)
+        print("imbibe <input_file>", file=sys.stderr)
+        print("imbibe --arxiv <arxiv_id>", file=sys.stderr)
+        print("imbibe --doi <doi>", file=sys.stderr)
     else:
         arg = sys.argv[1]
 
-        cache_filename = "autobib-cache.pkl"
+        cache_filename = "imbibe-cache.pkl"
 
         BibItem.load_cache(cache_filename)
 
