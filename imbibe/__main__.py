@@ -146,13 +146,13 @@ class BibItem(object):
         return bibitem
 
     def generate_bibtexid(self):
-        if self.arxivid is None:
-            if self.bibtex_id is None:
-                raise ValueError("For papers not referenced by arXiv ID, you have to" +
-                                  "manually specify a BibTeX ID.")
-            else:
-                return self.bibtex_id
-        return make_bibtexid_from_arxivid(self.first_author_lastname(), self.arxivid)
+        if self.bibtex_id is not None:
+            return self.bibtex_id
+        elif self.arxivid is None:
+            raise ValueError("For papers not referenced by arXiv ID, you have to" +
+                              "manually specify a BibTeX ID.")
+        else:
+            return make_bibtexid_from_arxivid(self.first_author_lastname(), self.arxivid)
 
     def first_author_lastname(self):
         if self.detailed_authors is not None:
