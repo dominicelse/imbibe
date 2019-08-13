@@ -69,6 +69,8 @@ def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
         # New style arxiv id.
         yymm = arxivid.split(".")[0]
         assert len(yymm) == 4
+
+    firstauthorlastname = firstauthorlastname.replace(" ", "")
     return firstauthorlastname + "_" + yymm
 
 class BibItem(object):
