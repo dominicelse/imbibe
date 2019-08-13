@@ -22,7 +22,7 @@ def populate_arxiv_information(list_of_bibitems):
         # Need to try all the arXiv IDs individually to find out which one was
         # not found.
         results = [ None ] * len(arxiv_ids)
-        for i in xrange(len(results)):
+        for i in range(len(results)):
             try:
                 results[i] = arxiv.query(id_list=arxiv_ids[i])[0]
             except Exception as ee:
