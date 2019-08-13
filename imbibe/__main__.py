@@ -27,7 +27,7 @@ def populate_arxiv_information(list_of_bibitems):
                 results[i] = arxiv.query(id_list=arxiv_ids[i])[0]
             except Exception as ee:
                 print("arXiv ID not found (or other error): " + arxiv_ids[i], file=sys.stderr)
-                raise ee
+                raise ee from None
 
     if len(results) != len(arxiv_ids):
         raise RuntimeError("arXiv returned wrong number of papers.")
