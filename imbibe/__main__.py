@@ -104,7 +104,7 @@ class BibItem(object):
             with open(filename, 'rb') as f:
                 BibItem.cache = pickle.load(f)
         except FileNotFoundError:
-            print("Warning: cache file not found.", sys.stderr)
+            print("Warning: cache file not found.", file=sys.stderr)
 
     @staticmethod
     def save_cache(filename):
