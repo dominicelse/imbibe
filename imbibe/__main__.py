@@ -61,6 +61,9 @@ def format_authorlist(l):
     else:
         return ''.join(s + " and " for s in l[0:-1]) + l[-1]
 
+def strip_nonalphabetic(s):
+    return ''.join(c for c in s if c.isalpha())
+
 def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
     if "/" in arxivid:
         # Old style arxiv id.
@@ -70,7 +73,7 @@ def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
         yymm = arxivid.split(".")[0]
         assert len(yymm) == 4
 
-    firstauthorlastname = firstauthorlastname.replace(" ", "")
+    firstauthorlastname = strip_nonalphabetic(firstauthorlastname)
     return firstauthorlastname + "_" + yymm
 
 class BibItem(object):
