@@ -10,18 +10,18 @@ Syntax for the input files:
 
 Each line should be of one of the following forms
 xxxx.yyyyy
-xxxx.yyyyy [opt1=value, opt2=value, ...]
+xxxx.yyyyy [opt1:value, opt2:value, ...]
 doi:zzzzz
-doi:zzzzz [opt1=value, opt2=value, ...]
+doi:zzzzz [opt1:value, opt2:value, ...]
 
 Where xxxx.yyyyy is an arxiv ID.
     (can also be an old-style ID like "cond-mat/xxxxxx")
 doi:zzzzz is a DOI.
 You can specify the following options in the [...]:
-    doi=zzzzz
+    doi:zzzzz
        If you specified an arXiv ID, but the DOI linked to it on arXiv is
        incorrect or not present.
-    bibtex_id=theidyouwant
+    bibtex_id:theidyouwant
        If you want to override the default BibTeX ID which imbibe generates.
        Note that for the moment imbibe only generates a default ID if you
        specify the paper by arXiv ID. If you specify by DOI then you must use
