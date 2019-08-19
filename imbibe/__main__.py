@@ -128,6 +128,7 @@ class BibItem(object):
             arxivid = main
 
         bibtex_id = None
+        suppress_volumewarning = False
 
         if len(splitline) > 1:
             opts = splitline[1]
@@ -144,9 +145,19 @@ class BibItem(object):
                         doi = value
                 elif key == 'bibtex_id':
                     bibtex_id = value
+                elif key == 'suppress_volumewarning':
+                    if value == 'yes':
+                        suppress_volumewarning = True
+                    elif value == 'no':
+                        pass
+                    else:
+                        raise RuntimeError("Invalid value: '" + value + "'")
+                else:
+                    raise RuntimeError("Invalid option name: '" + key + "'")
 
         bibitem = BibItem(arxivid, doi)
         bibitem.bibtex_id = bibtex_id
+        bibitem.suppress_volumewarning = suppress_volumewarning
 
         BibItem.cache[line] = bibitem
         return bibitem
@@ -189,9 +200,15 @@ class BibItem(object):
             print("  eprint={" + self.arxivid + "},")
         if self.journal is not None:
             print("  journal={" + self.journal_short + "},")
-            print("  volume={" + self.volume + "},")
             print("  pages={" + self.page + "},")
             print("  year={" + str(self.year) + "},")
+
+            # Sometimes papers don't come with volume numbers for some reason...
+            if self.volume is not None:
+                print("  volume={" + self.volume + "},")
+            elif not self.suppress_volumewarning:
+                print("WARNING: No volume in CrossRef data for paper:", file=sys.stderr)
+                print("   " + self.title, file=sys.stderr)
         if self.doi is not None:
             print("  doi={" + self.doi + "},")
         print("  title={" + self.title + "},")
@@ -222,8 +239,13 @@ class BibItem(object):
             self.journal_short = cr_result['short-container-title'][0]
             self.journal = cr_result['container-title'][0]
             self.year = cr_result['issued']['date-parts'][0][0]
-            self.volume = cr_result['volume']
             self.title = cr_result['title'][0]
+
+            try:
+                self.volume = cr_result['volume']
+            except KeyError:
+                self.volume = None
+
             try:
                 self.page = cr_result['article-number']
             except KeyError:
