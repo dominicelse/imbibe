@@ -274,7 +274,8 @@ if __name__ == '__main__':
             bibitems = [ BibItem(doi=sys.argv[2]) ]
         else:
             f = open(arg)
-            bibitems = [ BibItem.init_from_input_file_line(line) for line in f.readlines() ]
+            bibitems = [ BibItem.init_from_input_file_line(line) for line in f.readlines() 
+                    if line.strip() != '' ]
 
             if 'IMBIBE_MSG' in os.environ:
                 msg = os.environ['IMBIBE_MSG']
