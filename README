@@ -1,12 +1,16 @@
-To install on Linux (probably works on Mac too):
+====== Installation instructions (Mac/Linux): =======
 
-Install python3
-Run:
-$ pip3 install arxiv habanero
-copy imbibe/ to somewhere in $PYTHONPATH
-copy imbibe/imbibe to somewhere in $PATH and make it executable
+Install python3. On Ubuntu/Debian, also install the python3-venv package.
 
-Syntax for the input files:
+In the directory containing this file, run:
+$ ./make_env
+
+Now copy bin/imbibe into $PATH somewhere. Then you can invoke the command by
+running
+$ imbibe [INPUTFILE] >[OUTPUTFILE]
+
+
+====== Syntax for the input files: =======
 
 Each line should be of one of the following forms
 xxxx.yyyyy

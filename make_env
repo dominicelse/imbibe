@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+python3 -m venv imbibe_env/
+ln -s ../imbibe/ imbibe_env/
+source imbibe_env/bin/activate
+pip3 install arxiv habanero
+echo "#!/bin/bash" >bin/imbibe
+echo "source $PWD/imbibe_env/bin/activate" >>bin/imbibe
+echo 'python3 -m imbibe "$@"' >>bin/imbibe
+chmod u+x bin/imbibe
