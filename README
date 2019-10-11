@@ -5,9 +5,28 @@ Install python3. On Ubuntu/Debian, also install the python3-venv package.
 In the directory containing this file, run:
 $ ./make_env
 
-Now copy bin/imbibe into $PATH somewhere. Then you can invoke the command by
+Now copy bin/imbibe into $PATH somewhere.
+
+Then you can invoke the command by
 running
 $ imbibe [INPUTFILE] >[OUTPUTFILE]
+
+
+===== Installation instructions (Windows) ======
+
+(These instructions do not currently work, but they will in the future.)
+
+Install Python 3, e.g. from the following link:
+
+https://www.python.org/downloads/
+
+When running the installer, make sure to select the "Add Python to PATH" option.
+
+Run the "make_env.bat" file in this directory. Among other things, this will
+create a file called "runimbibe". Copy this file into the directory containing
+the "refs.txt" for your TeX project. Now you can run this command (e.g. by
+double-clicking in your file manager) to generate the refs-autobib.bib file
+from refs.txt
 
 
 ====== Syntax for the input files: =======
