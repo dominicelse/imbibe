@@ -21,12 +21,14 @@ Install Python 3, e.g. from the following link:
 https://www.python.org/downloads/
 
 When running the installer, make sure to select the "Add Python to PATH" option.
+If you already have Python installed (e.g. using the Anaconda distribution), this
+if fine as long as the Python executables are in your PATH.
 
-Run the "make_env.bat" file in this directory. Among other things, this will
-create a file called "runimbibe". Copy this file into the directory containing
+Run the "make_env_windows.bat" file in this directory. Among other things, this will
+create a file called "imbibehere.bat". Copy this file into the directory containing
 the "refs.txt" for your TeX project. Now you can run this command (e.g. by
 double-clicking in your file manager) to generate the refs-autobib.bib file
-from refs.txt
+from "refs.txt"
 
 
 ====== Syntax for the input files: =======
