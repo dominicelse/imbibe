@@ -15,7 +15,7 @@ $ imbibe [INPUTFILE] >[OUTPUTFILE]
 ====== Installation instructions (Mac): =======
 
 Install Python 3, for example from this link:
-https://www.python.org/downloads/release/python-374/
+https://www.python.org/downloads/
 
 If you already have Python installed (e.g. using the Anaconda distribution), this
 is fine as long as the Python executables are in your PATH.
