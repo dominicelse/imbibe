@@ -14,8 +14,6 @@ $ imbibe [INPUTFILE] >[OUTPUTFILE]
 
 ===== Installation instructions (Windows) ======
 
-(These instructions do not currently work, but they will in the future.)
-
 Install Python 3, e.g. from the following link:
 
 https://www.python.org/downloads/
