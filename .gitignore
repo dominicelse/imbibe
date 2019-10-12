@@ -1,3 +1,4 @@
 __pycache__
 imbibe_env/
-bin/
+bin/*
+!bin/.keepdir
