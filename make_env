@@ -6,7 +6,16 @@ python3 -m venv imbibe_env/
 ln -s ../imbibe/ imbibe_env/lib/python*/site-packages
 source imbibe_env/bin/activate
 pip3 install arxiv habanero
+
 echo "#!/bin/bash" >bin/imbibe
 echo "source '$PWD/imbibe_env/bin/activate'" >>bin/imbibe
 echo 'python3 -m imbibe "$@"' >>bin/imbibe
 chmod u+x bin/imbibe
+
+# On Mac OS X, also make a simpler helper script that can be run from the
+# Finder by double-clicking.
+if [ $(uname -s) == Darwin ]; then
+    echo "#!/bin/bash" >imbibehere.command
+    echo "'$PWD/bin/imbibe'" '"$@" refs.txt >ref-autobib.bib' >>imbibehere.command
+    chmod u+x imbibehere.command
+fi

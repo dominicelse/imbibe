@@ -3,3 +3,4 @@ imbibe_env/
 bin/*
 !bin/.keepdir
 imbibehere.bat
+imbibehere.command

@@ -1,4 +1,4 @@
-====== Installation instructions (Mac/Linux): =======
+====== Installation instructions (Linux): =======
 
 Install python3. On Ubuntu/Debian, also install the python3-venv package.
 
@@ -10,6 +10,26 @@ Now copy bin/imbibe into $PATH somewhere.
 Then you can invoke the command by
 running
 $ imbibe [INPUTFILE] >[OUTPUTFILE]
+
+
+====== Installation instructions (Mac): =======
+
+Install Python 3, for example from this link:
+https://www.python.org/downloads/release/python-374/
+
+If you already have Python installed (e.g. using the Anaconda distribution), this
+is fine as long as the Python executables are in your PATH.
+
+You can either follow the same instructions as for Linux above, or
+(for a more GUI-friendly approach):
+
+Double-click the "make_env.command" file in Finder.
+
+This will, among other things, create a file called "imbibehere.command"
+Copy this file into the directory containing the "refs.txt" for your TeX project.
+
+Now you can run this command (e.g. by double-clicking in Finder) to generate the
+refs-autobib.bib file from refs.txt
 
 
 ===== Installation instructions (Windows) ======
