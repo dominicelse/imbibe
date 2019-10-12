@@ -22,7 +22,7 @@ https://www.python.org/downloads/
 
 When running the installer, make sure to select the "Add Python to PATH" option.
 If you already have Python installed (e.g. using the Anaconda distribution), this
-if fine as long as the Python executables are in your PATH.
+is fine as long as the Python executables are in your PATH.
 
 Run the "make_env_windows.bat" file in this directory. Among other things, this will
 create a file called "imbibehere.bat". Copy this file into the directory containing
