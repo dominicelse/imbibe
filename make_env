@@ -7,6 +7,6 @@ ln -s ../imbibe/ imbibe_env/lib/python*/site-packages
 source imbibe_env/bin/activate
 pip3 install arxiv habanero
 echo "#!/bin/bash" >bin/imbibe
-echo "source $PWD/imbibe_env/bin/activate" >>bin/imbibe
+echo "source '$PWD/imbibe_env/bin/activate'" >>bin/imbibe
 echo 'python3 -m imbibe "$@"' >>bin/imbibe
 chmod u+x bin/imbibe
