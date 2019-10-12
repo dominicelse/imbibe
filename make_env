@@ -3,7 +3,7 @@ set -e
 
 mkdir imbibe_env/
 python3 -m venv imbibe_env/
-ln -s ../imbibe/ imbibe_env/lib/python*/site-packages
+ln -s ../../../../imbibe/ imbibe_env/lib/python*/site-packages
 source imbibe_env/bin/activate
 pip3 install arxiv habanero
 
