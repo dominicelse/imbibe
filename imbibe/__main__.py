@@ -94,6 +94,7 @@ class BibItem(object):
         self.detailed_authors = None
         self.bibtex_id = None
         self.abstract = None
+        self.comment = None
 
         self.arxiv_populated = False
         self.doi_populated = False
@@ -130,6 +131,7 @@ class BibItem(object):
         bibtex_id = None
         suppress_volumewarning = False
 
+        comment = None
         if len(splitline) > 1:
             opts = splitline[1]
             for opt in opts.split(","):
@@ -152,12 +154,15 @@ class BibItem(object):
                         pass
                     else:
                         raise RuntimeError("Invalid value: '" + value + "'")
+                elif key == 'comment':
+                    comment = value
                 else:
                     raise RuntimeError("Invalid option name: '" + key + "'")
 
         bibitem = BibItem(arxivid, doi)
         bibitem.bibtex_id = bibtex_id
         bibitem.suppress_volumewarning = suppress_volumewarning
+        bibitem.comment = comment
 
         BibItem.cache[line] = bibitem
         return bibitem
@@ -192,6 +197,10 @@ class BibItem(object):
         else:
             bibtex_id = self.generate_bibtexid()
 
+
+        if self.comment is not None:
+            print(self.comment)
+
         print("@article{" + self.generate_bibtexid() + ",")
         if self.abstract is not None:
             print("  abstract={" + self.abstract + "},")
@@ -214,6 +223,7 @@ class BibItem(object):
         print("  title={" + self.title + "},")
         print("  author={" + format_authorlist(self.authors) + "}")
         print("}")
+        print("")
 
     def read_arxiv_information(self,arxivresult):
         self.authors = arxivresult['authors']
