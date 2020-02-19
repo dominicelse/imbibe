@@ -200,6 +200,8 @@ class BibItem(object):
 
         if self.comment is not None:
             print(self.comment)
+        except AttributeError:
+            pass
 
         print("@article{" + self.generate_bibtexid() + ",")
         if self.abstract is not None:
