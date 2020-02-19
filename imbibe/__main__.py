@@ -198,8 +198,9 @@ class BibItem(object):
             bibtex_id = self.generate_bibtexid()
 
 
-        if self.comment is not None:
-            print(self.comment)
+        try:
+            if self.comment is not None:
+                print(self.comment)
         except AttributeError:
             pass
 
