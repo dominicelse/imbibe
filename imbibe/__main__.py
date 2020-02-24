@@ -4,6 +4,7 @@ import habanero
 import re
 import pickle
 import os
+import unidecode
 
 def populate_arxiv_information(list_of_bibitems):
     bibitems_with_arxivid = [ b for b in list_of_bibitems if
@@ -73,7 +74,7 @@ def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
         yymm = arxivid.split(".")[0]
         assert len(yymm) == 4
 
-    firstauthorlastname = strip_nonalphabetic(firstauthorlastname)
+    firstauthorlastname = unidecode.unidecode(strip_nonalphabetic(firstauthorlastname))
     return firstauthorlastname + "_" + yymm
 
 class BibItem(object):

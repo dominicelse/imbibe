@@ -9,7 +9,7 @@ mkdir imbibe_env %errhnd%
 py -3 -m venv imbibe_env %errhnd%
 call imbibe_env\Scripts\activate.bat %errhnd%
 pip3 install wheel
-pip3 install arxiv habanero %errhnd%
+pip3 install arxiv habanero unidecode %errhnd%
 xcopy imbibe imbibe_env\Lib\site-packages\imbibe\ %errhnd%
 
 echo ^@echo off >bin\imbibe.bat %errhnd%
