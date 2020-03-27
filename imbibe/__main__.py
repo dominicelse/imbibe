@@ -197,7 +197,7 @@ class BibItem(object):
     def __hash__(self):
         return hash(self.canonical_id)
 
-    def output_bib(self):
+    def output_bib(self, eprint_published):
         if self.bibtex_id is not None:
             bibtex_id = self.bibtex_id
         else:
@@ -213,7 +213,7 @@ class BibItem(object):
         print("@article{" + self.generate_bibtexid() + ",")
         if self.abstract is not None:
             print("  abstract={" + self.abstract + "},")
-        if self.arxivid is not None:
+        if self.arxivid is not None and (self.doi is None or eprint_published):
             print("  archiveprefix={arXiv},")
             print("  eprint={" + self.arxivid + "},")
         if self.journal is not None:
@@ -289,6 +289,9 @@ class BibItem(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='imbibe')
+    parser.add_argument("--no-eprint-published", action='store_false',
+            dest='eprint_published',
+            help="For published papers, don't include the arXiv ID in the BibTeX file.")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--arxiv")
     group.add_argument("--doi")
@@ -320,7 +323,7 @@ if __name__ == '__main__':
     populate_arxiv_information(bibitems)
     populate_doi_information(bibitems)
     for bibitem in bibitems:
-        bibitem.output_bib()
+        bibitem.output_bib(args.eprint_published)
 
     if use_cache:
         BibItem.save_cache(cache_filename)
