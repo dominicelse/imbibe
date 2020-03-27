@@ -300,6 +300,7 @@ if __name__ == '__main__':
         bibitems = [ BibItem(arxivid=args.arxiv) ]
     elif args.doi is not None:
         bibitems = [ BibItem(doi=args.doi) ]
+        bibitems[0].bibtex_id = 'ARTICLE'
     else:
         use_cache = True
         cache_filename = "imbibe-cache.pkl"
