@@ -133,6 +133,7 @@ class BibItem(object):
         suppress_volumewarning = False
 
         comment = None
+        origcase = False
         if len(splitline) > 1:
             opts = splitline[1]
             for opt in opts.split(","):
@@ -157,6 +158,8 @@ class BibItem(object):
                         raise RuntimeError("Invalid value: '" + value + "'")
                 elif key == 'comment':
                     comment = value
+                elif key == 'origcase' and value == 'yes':
+                    origcase = True
                 else:
                     raise RuntimeError("Invalid option name: '" + key + "'")
 
@@ -164,6 +167,7 @@ class BibItem(object):
         bibitem.bibtex_id = bibtex_id
         bibitem.suppress_volumewarning = suppress_volumewarning
         bibitem.comment = comment
+        bibitem.origcase = origcase
 
         BibItem.cache[line] = bibitem
         return bibitem
@@ -224,7 +228,16 @@ class BibItem(object):
                 print("   " + self.title, file=sys.stderr)
         if self.doi is not None:
             print("  doi={" + self.doi + "},")
-        print("  title={" + self.title + "},")
+
+        try:
+            origcase = self.origcase
+        except AttributeError:
+            origcase = False
+        if origcase:
+            print("  title={{" + self.title + "}},")
+        else:
+            print("  title={" + self.title + "},")
+
         print("  author={" + format_authorlist(self.authors) + "}")
         print("}")
         print("")
