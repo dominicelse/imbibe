@@ -10,7 +10,7 @@ import codecs
 
 # These are the bibtex fields which are allowed to get translated directly
 # from an option in an input file line to a corresponding BibTeX field.
-optional_bibtex_fields = [ 'addendum' ]
+optional_bibtex_fields = [ 'addendum', 'options' ]
 
 def unescape_string(s):
     return re.sub(r'(?<!\\)\\', '', s)
