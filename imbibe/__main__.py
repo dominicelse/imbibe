@@ -6,6 +6,14 @@ import pickle
 import os
 import unidecode
 import argparse
+import codecs
+
+# These are the bibtex fields which are allowed to get translated directly
+# from an option in an input file line to a corresponding BibTeX field.
+optional_bibtex_fields = [ 'addendum' ]
+
+def unescape_string(s):
+    return re.sub(r'(?<!\\)\\', '', s)
 
 def populate_arxiv_information(list_of_bibitems):
     bibitems_with_arxivid = [ b for b in list_of_bibitems if
@@ -119,7 +127,7 @@ class BibItem(object):
         if line in BibItem.cache:
             return BibItem.cache[line]
 
-        splitline = re.split('\[|\]', line)
+        splitline = re.split(r'(?<!\\)\[|(?<!\\)\]', line)
         main = splitline[0]
         doi = None
         arxivid = None
@@ -135,6 +143,7 @@ class BibItem(object):
 
         comment = None
         origcase = False
+        extra_bibtex_fields = {}
         if len(splitline) > 1:
             opts = splitline[1]
             for opt in opts.split(","):
@@ -158,9 +167,11 @@ class BibItem(object):
                     else:
                         raise RuntimeError("Invalid value: '" + value + "'")
                 elif key == 'comment':
-                    comment = value
+                    comment = unescape_string(value)
                 elif key == 'origcase' and value == 'yes':
                     origcase = True
+                elif key in optional_bibtex_fields:
+                    extra_bibtex_fields[key] = unescape_string(value)
                 else:
                     raise RuntimeError("Invalid option name: '" + key + "'")
 
@@ -169,6 +180,7 @@ class BibItem(object):
         bibitem.suppress_volumewarning = suppress_volumewarning
         bibitem.comment = comment
         bibitem.origcase = origcase
+        bibitem.extra_bibtex_fields = extra_bibtex_fields
 
         BibItem.cache[line] = bibitem
         return bibitem
@@ -202,7 +214,6 @@ class BibItem(object):
             bibtex_id = self.bibtex_id
         else:
             bibtex_id = self.generate_bibtexid()
-
 
         try:
             if self.comment is not None:
@@ -238,6 +249,13 @@ class BibItem(object):
             print("  title={{" + self.title + "}},")
         else:
             print("  title={" + self.title + "},")
+
+        try:
+            extra_bibtex_fields = self.extra_bibtex_fields
+        except AttributeError:
+            extra_bibtex_fields = {}
+        for key,value in extra_bibtex_fields.items():
+            print("  " + key + "={" + value + "},")
 
         print("  author={" + format_authorlist(self.authors) + "}")
         print("}")
