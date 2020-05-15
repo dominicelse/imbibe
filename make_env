@@ -6,7 +6,7 @@ python3 -m venv imbibe_env/
 ln -s ../../../../imbibe/ imbibe_env/lib/python*/site-packages
 source imbibe_env/bin/activate
 pip3 install wheel
-pip3 install arxiv habanero
+pip3 install arxiv habanero progressbar2
 pip3 install unidecode==1.1.1
 
 echo "#!/bin/bash" >bin/imbibe

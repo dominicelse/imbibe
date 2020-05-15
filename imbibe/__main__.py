@@ -6,11 +6,15 @@ import pickle
 import os
 import unidecode
 import argparse
+import time
+import progressbar
 
 try:
     from imbibe.opts import optional_bibtex_fields
 except ModuleNotFoundError:
     from imbibe.opts_default import optional_bibtex_fields
+
+cr = habanero.Crossref()
 
 def unescape_string(s):
     return re.sub(r'(?<!\\)\\', '', s)
@@ -45,6 +49,25 @@ def populate_arxiv_information(list_of_bibitems):
     for bibitem,result in zip(bibitems_with_arxivid, results):
         bibitem.read_arxiv_information(result)
 
+def crossref_read(dois):
+    chunk_size = 1
+    if len(dois) <= chunk_size:
+        results = cr.works(ids=dois)
+        if len(dois) == 1:
+            results = [ results ]
+        return results
+    else:
+        results = []
+        it = range(0,len(dois),chunk_size)
+
+        if len(dois) > 5:
+            print("Retrieving Crossref data (might take a while)...", file=sys.stderr)
+            it = progressbar.progressbar(it)
+
+        for i in it:
+            results += crossref_read(dois[i:(i+chunk_size)])
+            time.sleep(0.1)
+        return results
 
 def populate_doi_information(list_of_bibitems):
     bibitems_with_doi = [ b for b in list_of_bibitems if (b.doi is not None and
@@ -53,8 +76,7 @@ def populate_doi_information(list_of_bibitems):
     if len(dois) == 0:
         return
 
-    cr = habanero.Crossref()
-    results = cr.works(ids=dois)
+    results = crossref_read(dois)
 
     if len(dois) == 1:
         results = [ results ]
