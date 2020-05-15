@@ -78,9 +78,6 @@ def populate_doi_information(list_of_bibitems):
 
     results = crossref_read(dois)
 
-    if len(dois) == 1:
-        results = [ results ]
-
     for bibitem,result in zip(bibitems_with_doi, results):
         bibitem.read_journal_information(result)
 
