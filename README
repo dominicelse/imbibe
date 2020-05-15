@@ -96,7 +96,14 @@ You can specify the following options in the [...]:
 
 ===== Other notes =======
 
-When run, imbibe creates a cache file called "imbibe-cache.pkl". If you want to
-automatically bring in new information for the cited references (for example, an
-arXiv paper that now has a published DOI associated with it), then delete this
-file and run imbibe again.
+* When run, imbibe creates a cache file called "imbibe-cache.pkl". If you want
+  to automatically bring in new information for the cited references (for
+  example, an arXiv paper that now has a published DOI associated with it), then
+  delete this file and run imbibe again.
+
+* In order to get correct output of author names and titles containing non-Ascii
+  characters, you will need to add the line
+  
+      \usepackage[utf8]{inputenc}
+  
+  to your LaTeX file.
