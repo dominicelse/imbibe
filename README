@@ -84,6 +84,9 @@ You can specify the following options in the [...]:
        If one of these options is specified, then imbibe will create a "comment"
        or "addendum" field for this entry in the BibTeX file with the specified
        value.
+       To allow for other options which get translated directly to BibTeX
+       fields, copy the imbibe/opts_default.py file to imbibe/opts.py and then
+       edit the imbibe/opts.py file as desired.
        
 
 ===== Other notes =======

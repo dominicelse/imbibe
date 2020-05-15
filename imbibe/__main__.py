@@ -8,9 +8,10 @@ import unidecode
 import argparse
 import codecs
 
-# These are the bibtex fields which are allowed to get translated directly
-# from an option in an input file line to a corresponding BibTeX field.
-optional_bibtex_fields = [ 'addendum', 'options' ]
+try:
+    from imbibe.opts import optional_bibtex_fields
+except ModuleNotFoundError:
+    from imbibe.opts_default import optional_bibtex_fields
 
 def unescape_string(s):
     return re.sub(r'(?<!\\)\\', '', s)

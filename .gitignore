@@ -1,5 +1,6 @@
 __pycache__
 imbibe_env/
+imbibe/opts.py
 bin/*
 !bin/.keepdir
 imbibehere.bat
