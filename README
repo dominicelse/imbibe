@@ -69,3 +69,26 @@ You can specify the following options in the [...]:
        Note that for the moment imbibe only generates a default ID if you
        specify the paper by arXiv ID. If you specify by DOI then you must use
        this option to set the BibTeX ID.
+   suppress_volumewarning:yes|no (default: no)
+       Occasionally you run across papers whose bibliographic data does not
+       contain journal volume information. In this case, by default imbibe will process
+       this entry but spit out a warning. Setting suppress_volumewarning:yes
+       will prevent the warning from being generated for this entry.
+   origcase:yes|no (default:no)
+       Setting origcase:yes causes the title field in the BibTeX file for this
+       paper to be surrounded with {{ and }}. This has the effect of preventing
+       BibTeX from converting the title to lower case when it generates the
+       bibliography.
+   comment:value
+   addendum:value
+       If one of these options is specified, then imbibe will create a "comment"
+       or "addendum" field for this entry in the BibTeX file with the specified
+       value.
+       
+
+===== Other notes =======
+
+When run, imbibe creates a cache file called "imbibe-cache.pkl". If you want to
+automatically bring in new information for the cited references (for example, an
+arXiv paper that now has a published DOI associated with it), then delete this
+file and run imbibe again.
