@@ -8,6 +8,7 @@ import unidecode
 import argparse
 import time
 import progressbar
+import json
 
 try:
     from imbibe.opts import optional_bibtex_fields
@@ -132,14 +133,20 @@ class BibItem(object):
     def load_cache(filename):
         try:
             with open(filename, 'rb') as f:
-                BibItem.cache = pickle.load(f)
+                def init_from_dict(d):
+                    obj = BibItem.__new__(BibItem)
+                    obj.__dict__ = d
+                    return obj
+
+                BibItem.cache = dict( (k, init_from_dict(obj)) for k,obj in json.load(f).items())
         except FileNotFoundError:
             print("Warning: cache file not found.", file=sys.stderr)
 
     @staticmethod
     def save_cache(filename):
-        with open(filename, 'wb') as f:
-            pickle.dump(BibItem.cache, f)
+        with open(filename, 'w') as f:
+            json.dump(dict( (k,i.__dict__) for k,i in BibItem.cache.items()),
+                    f)
 
     @staticmethod
     def init_from_input_file_line(line):
@@ -362,15 +369,15 @@ if __name__ == '__main__':
             bibitems[0].bibtex_id = 'ARTICLE'
         else:
             use_cache = True
-            cache_filename = "imbibe-cache.pkl"
+            cache_filename = "imbibe-cache.json"
             BibItem.load_cache(cache_filename)
 
             if args.outputfile is not None:
                 outputfilename = args.outputfile
                 fout = OpenFileWithPath.open(outputfilename, 'w', encoding='utf-8')
                 print_ = print
-                def myprint(s='', file=fout):
-                    print_(s, file=file)
+                def myprint(*args, file=fout):
+                    print_(*args, file=file)
                 print = myprint
             else:
                 fout = None
