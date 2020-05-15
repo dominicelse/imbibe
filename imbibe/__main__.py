@@ -146,7 +146,7 @@ class BibItem(object):
     def save_cache(filename):
         with open(filename, 'w') as f:
             json.dump(dict( (k,i.__dict__) for k,i in BibItem.cache.items()),
-                    f)
+                    f, indent=0)
 
     @staticmethod
     def init_from_input_file_line(line):
