@@ -14,7 +14,7 @@ try:
 except ModuleNotFoundError:
     from imbibe.opts_default import optional_bibtex_fields
 
-cr = habanero.Crossref()
+cr = habanero.Crossref(ua_string = "imbibe")
 
 def unescape_string(s):
     return re.sub(r'(?<!\\)\\', '', s)
