@@ -79,11 +79,16 @@ You can specify the following options in the [...]:
        paper to be surrounded with {{ and }}. This has the effect of preventing
        BibTeX from converting the title to lower case when it generates the
        bibliography.
-   comment:value
+   comment:text
+       If specified, imbibe will add the text to the BibTeX file above the entry
+       for this paper, as a "comment". Note that if you want this text to
+       contain one of the following characters: \:,[] you should escape them,
+       e.g. replace "Hello, World!" with "Hello\, World!"
+   options:value
    addendum:value
-       If one of these options is specified, then imbibe will create a "comment"
+       If one of these is specified, then imbibe will create an "options"
        or "addendum" field for this entry in the BibTeX file with the specified
-       value.
+       value. Special characters should be escaped as for the "comment" option.
        To allow for other options which get translated directly to BibTeX
        fields, copy the imbibe/opts_default.py file to imbibe/opts.py and then
        edit the imbibe/opts.py file as desired.
