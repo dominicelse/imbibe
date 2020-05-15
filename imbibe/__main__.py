@@ -6,7 +6,6 @@ import pickle
 import os
 import unidecode
 import argparse
-import codecs
 
 try:
     from imbibe.opts import optional_bibtex_fields
