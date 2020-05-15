@@ -9,7 +9,7 @@ Now copy bin/imbibe into $PATH somewhere.
 
 Then you can invoke the command by
 running
-$ imbibe [INPUTFILE] >[OUTPUTFILE]
+$ imbibe [INPUTFILE] [OUTPUTFILE]
 
 
 ====== Installation instructions (Mac): =======

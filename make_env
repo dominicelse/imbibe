@@ -18,6 +18,6 @@ chmod u+x bin/imbibe
 # Finder by double-clicking.
 if [ $(uname -s) == Darwin ]; then
     echo "#!/bin/bash" >imbibehere.command
-    echo "'$PWD/bin/imbibe'" '"$@" refs.txt >ref-autobib.bib' >>imbibehere.command
+    echo "'$PWD/bin/imbibe'" '"$@" refs.txt ref-autobib.bib' >>imbibehere.command
     chmod u+x imbibehere.command
 fi

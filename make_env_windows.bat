@@ -17,7 +17,7 @@ echo setlocal >>bin\imbibe.bat %errhnd%
 echo set PYTHONIOENCODING=UTF-8 >>bin\imbibe.bat %errhnd%
 echo "%CD%\imbibe_env\Scripts\python" -m imbibe %%^* >>bin\imbibe.bat %errhnd%
 
-echo call "%CD%\bin\imbibe" refs.txt ^>ref-autobib.bib %%^* ^|^| ^(pause ^&^& exit /b 1) >imbibehere.bat %errhnd%
+echo call "%CD%\bin\imbibe" refs.txt ref-autobib.bib %%^* ^|^| ^(pause ^&^& exit /b 1) >imbibehere.bat %errhnd%
 echo echo Imbibe ran successfully. >>imbibehere.bat %errhnd%
 echo pause >>imbibehere.bat %errhnd%
 
