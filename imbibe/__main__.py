@@ -307,8 +307,8 @@ class BibItem(object):
 
 class OpenFileWithPath:
     @staticmethod
-    def open(path, mode='r'):
-        return OpenFileWithPath(path, open(path, mode))
+    def open(path, *args, **kwargs):
+        return OpenFileWithPath(path, open(path, *args, **kwargs))
 
     def __init__(self, path, f):
         self.f = f
@@ -348,7 +348,7 @@ if __name__ == '__main__':
 
             if args.outputfile is not None:
                 outputfilename = args.outputfile
-                fout = OpenFileWithPath.open(outputfilename, 'w')
+                fout = OpenFileWithPath.open(outputfilename, 'w', encoding='utf-8')
                 print_ = print
                 def myprint(s='', file=fout):
                     print_(s, file=file)
