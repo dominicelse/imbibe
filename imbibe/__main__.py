@@ -114,6 +114,15 @@ def process_text(text):
     else:
         return text
 
+def origcase_heuristic(title):
+    words = title.split()
+    n = len(words)
+    ncapitalized = sum(word[0].isupper() for word in words)
+    if ncapitalized / n > 0.5:
+        return False
+    else:
+        return True
+
 class BibItem(object):
     cache = {}
 
@@ -176,7 +185,7 @@ class BibItem(object):
         suppress_volumewarning = False
 
         comment = None
-        origcase = False
+        origcase = None
         extra_bibtex_fields = {}
         if len(splitline) > 1:
             opts = splitline[1]
@@ -202,8 +211,13 @@ class BibItem(object):
                         raise RuntimeError("Invalid value: '" + value + "'")
                 elif key == 'comment':
                     comment = unescape_string(value)
-                elif key == 'origcase' and value == 'yes':
-                    origcase = True
+                elif key == 'origcase':
+                    if value == 'yes':
+                        origcase = True
+                    elif value == 'no':
+                        origcase = False
+                    elif value == 'auto':
+                        origcase = None
                 elif key in optional_bibtex_fields:
                     extra_bibtex_fields[key] = unescape_string(value)
                 else:
@@ -278,7 +292,9 @@ class BibItem(object):
         try:
             origcase = self.origcase
         except AttributeError:
-            origcase = False
+            origcase = None
+        if origcase is None:
+            origcase = origcase_heuristic(self.title)
         if origcase:
             print("  title={{" + self.title + "}},")
         else:

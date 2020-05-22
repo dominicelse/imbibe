@@ -74,11 +74,13 @@ You can specify the following options in the [...]:
        contain journal volume information. In this case, by default imbibe will process
        this entry but spit out a warning. Setting suppress_volumewarning:yes
        will prevent the warning from being generated for this entry.
-   origcase:yes|no (default:no)
+   origcase:yes|no|auto (default:auto)
        Setting origcase:yes causes the title field in the BibTeX file for this
        paper to be surrounded with {{ and }}. This has the effect of preventing
        BibTeX from converting the title to lower case when it generates the
-       bibliography.
+       bibliography. Setting origcase:auto will cause imbibe to attempt to guess
+       whether the journal title is using "title capitalization" or not; if so,
+       it chooses origcase:no; otherwise, it chooses origcase:yes.
    comment:text
        If specified, imbibe will add the text to the BibTeX file above the entry
        for this paper, as a "comment". Note that if you want this text to
