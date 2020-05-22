@@ -106,6 +106,14 @@ def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
     firstauthorlastname = unidecode.unidecode(strip_nonalphabetic(firstauthorlastname))
     return firstauthorlastname + "_" + yymm
 
+def process_text(text):
+    if isinstance(text, str):
+        # For some reason, some Crossref entries contain a weird Unicode character
+        # instead of a normal space.
+        return text.replace("\u2009", " ")
+    else:
+        return text
+
 class BibItem(object):
     cache = {}
 
@@ -378,12 +386,12 @@ if __name__ == '__main__':
             if args.outputfile is not None:
                 outputfilename = args.outputfile
                 fout = OpenFileWithPath.open(outputfilename, 'w', encoding='utf-8')
-                print_ = print
-                def myprint(*args, file=fout):
-                    print_(*args, file=file)
-                print = myprint
             else:
-                fout = None
+                fout = sys.stdout
+            print_ = print
+            def myprint(*args, file=fout):
+                print_(*(process_text(arg) for arg in args), file=file)
+            print = myprint
 
             f = open(args.inputfile)
             bibitems = [ BibItem.init_from_input_file_line(line) for line in f.readlines() 
