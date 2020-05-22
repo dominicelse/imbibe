@@ -335,22 +335,37 @@ class BibItem(object):
 
         self.arxiv_populated = True
 
-    @staticmethod
-    def bad_journal_exit(journalname):
+    def bad_journal_exit(self, journalname):
         print("The following journal is known to have improper Crossref data:", file=sys.stderr)
         print("    " + journalname, file=sys.stderr)
         print("You will need to add papers from this journal to your BibTeX file manually.", file=sys.stderr)
         print("Exiting with error.", file=sys.stderr)
         sys.exit(1)
 
+    def bad_type_exit(self, crossref_type):
+        print("The Crossref entry with DOI:", file=sys.stderr)
+        print("    " + self.doi, file=sys.stderr)
+        if self.arxivid is not None:
+            print("linked to arXiv ID:", file=sys.stderr)
+            print("    " + self.arxivid, file=sys.stderr)
+        print("has type:", file=sys.stderr)
+        print("    " + crossref_type, file=sys.stderr)
+        print("Currently, only type 'journal-article' is supported.", file=sys.stderr)
+        print("You will need to add this entry to your BibTeX file manually.", file=sys.stderr)
+        print("Exiting with error.", file=sys.stderr)
+        sys.exit(1)
+
     def read_journal_information(self,cr_result):
         try:
             cr_result = cr_result['message']
+            crossref_type = cr_result['type']
+            if crossref_type != "journal-article":
+                self.bad_type_exit(crossref_type)
             self.detailed_authors = cr_result['author']
             self.authors = [ format_author(auth) for auth in self.detailed_authors ]
             self.journal = cr_result['container-title'][0]
             if self.journal in BibItem.badjournals:
-                BibItem.bad_journal_exit(self.journal)
+                self.bad_journal_exit(self.journal)
             try:
                 self.journal_short = cr_result['short-container-title'][0]
             except IndexError:
