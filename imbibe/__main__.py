@@ -435,6 +435,6 @@ if __name__ == '__main__':
         if use_cache:
             BibItem.save_cache(cache_filename)
     except:
-        if fout is not None:
+        if fout is not None and isinstance(fout, OpenFileWithPath):
             fout.close_and_delete()
         raise
