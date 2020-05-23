@@ -116,7 +116,7 @@ def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
 def process_text(text):
     if isinstance(text, str):
         # Some character substitutions to deal with Unicode characters that LaTeX tends to choke on.
-        subs = { "\u2008" : " " ,
+        subs = { "\u2009" : " " ,
                  "\u2212" : "--" }
         def replace(c):
             if c in subs.keys():
