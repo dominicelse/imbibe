@@ -134,7 +134,8 @@ def protect_words(title):
         word = split[i]
         if len(word) == 0:
             continue
-        if word[0].isupper() and word in protected_words:
+        if (sum(c.isupper() for c in word) > 1
+                or (word[0].isupper() and word in protected_words)):
             split[i] = "{" + word + "}"
     return ''.join(split)
 
