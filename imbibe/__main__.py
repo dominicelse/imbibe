@@ -427,7 +427,7 @@ class BibItem(object):
         if self.abstract is not None:
             printfield("abstract", self.abstract)
         if self.arxivid is not None and (self.doi is None or eprint_published):
-            printfield("archiveprefix", "arxiv")
+            printfield("archiveprefix", "arXiv")
             printfield("eprint", self.arxivid)
         if self.journal is not None:
             printfield("journal", self.journal_short)
