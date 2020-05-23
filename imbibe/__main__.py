@@ -118,20 +118,69 @@ def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
     firstauthorlastname = unidecode.unidecode(strip_nonalphabetic(firstauthorlastname))
     return firstauthorlastname + "_" + yymm
 
+def make_charsubs():
+    # Some character substitutions to deal with Unicode characters that LaTeX tends to choke on.
+    charsubs = { "\u2009" : " " ,
+             "\u2212" : "--" }
+
+    # This leaves out the letters which look identical to Roman
+    # letters and don't have their own LaTeX codes.
+    greek_letter_dict = {
+        u'\u0393': 'Gamma',
+        u'\u0394': 'Delta',
+        u'\u0395': 'Epsilon',
+        u'\u0396': 'Zeta',
+        u'\u0398': 'Theta',
+        u'\u039B': 'Lamda',
+        u'\u039E': 'Xi',
+        u'\u03A0': 'Pi',
+        u'\u03A3': 'Sigma',
+        u'\u03A6': 'Phi',
+        u'\u03A8': 'Psi',
+        u'\u03A9': 'Omega',
+        u'\u03B1': 'alpha',
+        u'\u03B2': 'beta',
+        u'\u03B3': 'gamma',
+        u'\u03B4': 'delta',
+        u'\u03B5': 'epsilon',
+        u'\u03B6': 'zeta',
+        u'\u03B7': 'eta',
+        u'\u03B8': 'theta',
+        u'\u03B9': 'iota',
+        u'\u03BA': 'kappa',
+        u'\u03BB': 'lambda',
+        u'\u03BC': 'mu',
+        u'\u03BD': 'nu',
+        u'\u03BE': 'xi',
+        u'\u03C0': 'pi',
+        u'\u03C1': 'rho',
+        u'\u03C3': 'sigma',
+        u'\u03C4': 'tau',
+        u'\u03C5': 'upsilon',
+        u'\u03C6': 'phi',
+        u'\u03C7': 'chi',
+        u'\u03C8': 'psi',
+        u'\u03C9': 'omega'
+    }
+
+    for c,name in greek_letter_dict.items():
+        charsubs[c] = '$' + name + '$'
+
+    return charsubs
+charsubs = make_charsubs()
+
 def process_text(text):
     if isinstance(text, str):
-        # Some character substitutions to deal with Unicode characters that LaTeX tends to choke on.
-        subs = { "\u2009" : " " ,
-                 "\u2212" : "--" }
         def replace(c):
-            if c in subs.keys():
-                return subs[c]
+            if c in charsubs.keys():
+                return charsubs[c]
             else:
                 return c
 
         return "".join(replace(c) for c in text)
     else:
         return text
+
 
 def protect_words(title):
     split = re.split('([-\s])', title)
