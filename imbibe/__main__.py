@@ -27,10 +27,37 @@ def unescape_string(s):
     return re.sub(r'(?<!\\)\\', '', s)
 
 def bibtex_escape(s):
-    # Bibtex can't deal with braces inside the entry (especially if they are
-    # unpaired, at least), so for the moment we just get rid of them. Probably
-    # there's a better solution.
-    return re.sub('[{}]', '', s)
+    # Bibtex can't deal with unmatched braces inside the entry, so we get rid of
+    # them.
+    def unmatched_brace_deleter(s, opposite=False):
+        bracelevel = 0
+        if opposite:
+            closing = '{'
+            opening = '}'
+        else:
+            closing = '}'
+            opening = '{'
+        for c in s:
+            if c == closing:
+                if bracelevel == 0:
+                    continue
+                bracelevel -= 1
+            elif c == opening:
+                bracelevel += 1
+            yield c
+    def reverse_string(s):
+        return s[::-1]
+
+    # Remove unmatched closing brace
+    s = ''.join(unmatched_brace_deleter(s))
+
+    # Remove unmatched opening brace
+    s = reverse_string(s)
+    s = ''.join(unmatched_brace_deleter(s, opposite=True))
+    s = reverse_string(s)
+
+    # todo: how do we know if we removed the right bracket?
+    return s
 
 def populate_arxiv_information(list_of_bibitems):
     bibitems_with_arxivid = [ b for b in list_of_bibitems if
