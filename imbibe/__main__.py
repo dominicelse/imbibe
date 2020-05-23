@@ -16,6 +16,12 @@ try:
 except ModuleNotFoundError:
     from imbibe.opts_default import optional_bibtex_fields
 
+try:
+    with open("capitalized_words.txt", "r") as f:
+        protected_words = [ line.rstrip("\n") for line in f ]
+except FileNotFoundError:
+    protected_words = []
+
 cr = habanero.Crossref(ua_string = "imbibe")
 
 def unescape_string(s):
@@ -114,6 +120,17 @@ def process_text(text):
         return text.replace("\u2009", " ")
     else:
         return text
+
+def protect_words(title):
+    split = re.split('(\W)', title)
+    print(split, file=sys.stderr)
+    for i in range(len(split)):
+        word = split[i]
+        if len(word) == 0:
+            continue
+        if word[0].isupper() and word in protected_words:
+            split[i] = "{" + word + "}"
+    return ''.join(split)
 
 def origcase_heuristic(title):
     words = title.split()
@@ -306,7 +323,7 @@ class BibItem(object):
         if origcase:
             print("  title={{" + self.title + "}},")
         else:
-            print("  title={" + self.title + "},")
+            print("  title={" + protect_words(self.title) + "},")
 
         try:
             extra_bibtex_fields = self.extra_bibtex_fields
