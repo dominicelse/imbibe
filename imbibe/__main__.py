@@ -457,7 +457,7 @@ class BibItem(object):
         for key,value in extra_bibtex_fields.items():
             printfield(key, value)
 
-        printfield("author", format_authorlist(self.authors))
+        printfield("author", format_authorlist(self.authors), lastone=True)
         print("}")
         print("")
 
