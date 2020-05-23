@@ -130,7 +130,6 @@ def process_text(text):
 
 def protect_words(title):
     split = re.split('(\W)', title)
-    print(split, file=sys.stderr)
     for i in range(len(split)):
         word = split[i]
         if len(word) == 0:
