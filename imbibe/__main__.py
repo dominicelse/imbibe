@@ -129,7 +129,7 @@ def process_text(text):
         return text
 
 def protect_words(title):
-    split = re.split('(\s)', title)
+    split = re.split('([-\s])', title)
     for i in range(len(split)):
         word = split[i]
         if len(word) == 0:
