@@ -109,9 +109,16 @@ def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
 
 def process_text(text):
     if isinstance(text, str):
-        # For some reason, some Crossref entries contain a weird Unicode character
-        # instead of a normal space.
-        return text.replace("\u2009", " ")
+        # Some character substitutions to deal with Unicode characters that LaTeX tends to choke on.
+        subs = { "\u2008" : " " ,
+                 "\u2212" : "--" }
+        def replace(c):
+            if c in subs.keys():
+                return subs[c]
+            else:
+                return c
+
+        return "".join(replace(c) for c in text)
     else:
         return text
 
