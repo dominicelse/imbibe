@@ -217,7 +217,6 @@ class BibItem(object):
         suppress_volumewarning = False
 
         comment = None
-        origcase = None
         extra_bibtex_fields = {}
         if len(splitline) > 1:
             opts = splitline[1]
@@ -243,13 +242,6 @@ class BibItem(object):
                         raise RuntimeError("Invalid value: '" + value + "'")
                 elif key == 'comment':
                     comment = unescape_string(value)
-                elif key == 'origcase':
-                    if value == 'yes':
-                        origcase = True
-                    elif value == 'no':
-                        origcase = False
-                    elif value == 'auto':
-                        origcase = None
                 elif key in optional_bibtex_fields:
                     extra_bibtex_fields[key] = unescape_string(value)
                 else:
@@ -259,7 +251,6 @@ class BibItem(object):
         bibitem.bibtex_id = bibtex_id
         bibitem.suppress_volumewarning = suppress_volumewarning
         bibitem.comment = comment
-        bibitem.origcase = origcase
         bibitem.extra_bibtex_fields = extra_bibtex_fields
 
         BibItem.cache[line] = bibitem
@@ -321,12 +312,7 @@ class BibItem(object):
         if self.doi is not None:
             print("  doi={" + self.doi + "},")
 
-        try:
-            origcase = self.origcase
-        except AttributeError:
-            origcase = None
-        if origcase is None:
-            origcase = origcase_heuristic(self.title)
+        origcase = origcase_heuristic(self.title)
         if origcase:
             print("  title={{" + self.title + "}},")
         else:
