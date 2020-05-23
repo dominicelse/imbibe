@@ -9,6 +9,8 @@ import time
 import progressbar
 import json
 import inspect
+import urllib.request
+import bibtexparser
 
 try:
     from imbibe.opts import optional_bibtex_fields
@@ -109,6 +111,28 @@ def crossref_read(dois):
             time.sleep(0.1)
         return results
 
+def aps_read(dois):
+    if len(dois) == 0:
+        return []
+    elif len(dois) == 1:
+        url = "https://dx.doi.org/" + dois[0]
+        redirecturl = urllib.request.urlopen(url).geturl()
+        exporturl = redirecturl.replace("abstract", "export")
+        bibtex = urllib.request.urlopen(exporturl).read()
+        bibtex_data = bibtexparser.loads(bibtex).entries[0]
+        return [bibtex_data]
+    else:
+        results = []
+        it = range(len(dois))
+        if len(dois) > 5:
+            print("Retrieving APS data (might take a while)...", file=sys.stderr)
+            it = progressbar.progressbar(it)
+
+        for i in it:
+            results += aps_read([dois[i]])
+            time.sleep(0.1)
+        return results
+
 def populate_doi_information(list_of_bibitems):
     bibitems_with_doi = [ b for b in list_of_bibitems if (b.doi is not None and
         not b.doi_populated) ]
@@ -120,6 +144,17 @@ def populate_doi_information(list_of_bibitems):
 
     for bibitem,result in zip(bibitems_with_doi, results):
         bibitem.read_journal_information(result)
+
+def populate_aps_information(list_of_bibitems):
+    bibitems_aps = [ b for b in list_of_bibitems if ((not b.aps_populated) and b.is_aps()) ]
+    dois = [ b.doi for b in bibitems_aps ]
+    if len(dois) == 0:
+        return
+
+    results = aps_read(dois)
+
+    for bibitem,result in zip(bibitems_aps, results):
+        bibitem.read_aps_information(result)
 
 def format_author(auth):
     return auth['family'] + ", " + auth['given']
@@ -249,9 +284,11 @@ class BibItem(object):
         self.bibtex_id = None
         self.abstract = None
         self.comment = None
+        self.publisher = None
 
         self.arxiv_populated = False
         self.doi_populated = False
+        self.aps_populated = False
 
     def load_bad_journals():
         thisfile = inspect.getfile(inspect.currentframe())
@@ -336,6 +373,15 @@ class BibItem(object):
 
         BibItem.cache[line] = bibitem
         return bibitem
+
+    def is_aps(self):
+        try:
+            if self.publisher is None:
+                return False
+            else:
+                return self.publisher == "American Physical Society (APS)"
+        except AttributeError:
+            return False
 
     def generate_bibtexid(self):
         if self.bibtex_id is not None:
@@ -431,6 +477,15 @@ class BibItem(object):
 
         self.arxiv_populated = True
 
+    def read_aps_information(self, apsresult):
+        # The Crossref information for APS journals has broken title field for titles
+        # that contain an equation. On the other hand the APS website lets you export a
+        # BibTeX entry for all their papers which does have the correct the information.
+        # So we use that instead.
+        self.title = apsresult['title']
+
+        self.aps_populated = True
+
     def bad_journal_exit(self, journalname):
         print("The following journal is known to have improper Crossref data:", file=sys.stderr)
         print("    " + journalname, file=sys.stderr)
@@ -460,6 +515,7 @@ class BibItem(object):
             self.detailed_authors = cr_result['author']
             self.authors = [ format_author(auth) for auth in self.detailed_authors ]
             self.journal = cr_result['container-title'][0]
+            self.publisher = cr_result['publisher']
             if self.journal in BibItem.badjournals:
                 self.bad_journal_exit(self.journal)
             try:
@@ -553,6 +609,7 @@ if __name__ == '__main__':
 
         populate_arxiv_information(bibitems)
         populate_doi_information(bibitems)
+        populate_aps_information(bibitems)
 
         if args.print_keys:
             for bibitem in bibitems:
