@@ -2,7 +2,6 @@ import arxiv
 import sys
 import habanero
 import re
-import pickle
 import os
 import unidecode
 import argparse
