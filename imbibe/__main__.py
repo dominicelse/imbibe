@@ -26,6 +26,12 @@ cr = habanero.Crossref(ua_string = "imbibe")
 def unescape_string(s):
     return re.sub(r'(?<!\\)\\', '', s)
 
+def bibtex_escape(s):
+    # Bibtex can't deal with braces inside the entry (especially if they are
+    # unpaired, at least), so for the moment we just get rid of them. Probably
+    # there's a better solution.
+    return re.sub('[{}]', '', s)
+
 def populate_arxiv_information(list_of_bibitems):
     bibitems_with_arxivid = [ b for b in list_of_bibitems if
             (b.arxivid is not None and not b.arxiv_populated) ]
@@ -291,40 +297,45 @@ class BibItem(object):
         except AttributeError:
             pass
 
+        def printfield(field,value, lastone=False):
+            print("  " + field + "={" + bibtex_escape(value) + "}" +
+                    ("" if lastone else ","))
+
         print("@article{" + self.generate_bibtexid() + ",")
         if self.abstract is not None:
-            print("  abstract={" + self.abstract + "},")
+            printfield("abstract", self.abstract)
         if self.arxivid is not None and (self.doi is None or eprint_published):
-            print("  archiveprefix={arXiv},")
-            print("  eprint={" + self.arxivid + "},")
+            printfield("archiveprefix", "arxiv")
+            printfield("eprint", self.arxivid)
         if self.journal is not None:
-            print("  journal={" + self.journal_short + "},")
-            print("  pages={" + self.page + "},")
-            print("  year={" + str(self.year) + "},")
+            printfield("journal", self.journal_short)
+            printfield("pages", self.page)
+            printfield("year", str(self.year))
 
             # Sometimes papers don't come with volume numbers for some reason...
             if self.volume is not None:
-                print("  volume={" + self.volume + "},")
+                printfield("volume", self.volume)
             elif not self.suppress_volumewarning:
                 print("WARNING: No volume in CrossRef data for paper:", file=sys.stderr)
                 print("   " + self.title, file=sys.stderr)
         if self.doi is not None:
-            print("  doi={" + self.doi + "},")
+            printfield("doi", self.doi)
 
         origcase = origcase_heuristic(self.title)
+        title = bibtex_escape(self.title)
         if origcase:
-            print("  title={{" + self.title + "}},")
+            print("  title={{" + title + "}},")
         else:
-            print("  title={" + protect_words(self.title) + "},")
+            print("  title={" + protect_words(title) + "},")
 
         try:
             extra_bibtex_fields = self.extra_bibtex_fields
         except AttributeError:
             extra_bibtex_fields = {}
         for key,value in extra_bibtex_fields.items():
-            print("  " + key + "={" + value + "},")
+            printfield(key, value)
 
-        print("  author={" + format_authorlist(self.authors) + "}")
+        printfield("author", format_authorlist(self.authors))
         print("}")
         print("")
 
