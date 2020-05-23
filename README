@@ -102,3 +102,7 @@ You can specify the following options in the [...]:
       \usepackage[utf8]{inputenc}
   
   to your LaTeX file.
+
+* To get proper capitalization of proper names in article titles, you can
+  create a file called "capitalized_words.txt" in the directory where you run
+  "imbibe", whose lines correspond to words that should always be capitalized.
