@@ -449,7 +449,7 @@ if __name__ == '__main__':
                 fout = sys.stdout
             print_ = print
             def myprint(*args, file=fout, **kwargs):
-                print_(*(process_text(arg) for arg in args), file=file)
+                print_(*(process_text(arg) for arg in args), file=file, **kwargs)
             print = myprint
 
             f = open(args.inputfile)
