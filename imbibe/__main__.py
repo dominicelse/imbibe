@@ -31,7 +31,7 @@ def load_journal_abbreviations():
     journals_dir = os.path.join(os.path.dirname(thisfile), "journals")
     for filename in os.listdir(journals_dir):
         if filename.endswith(".csv"):
-            with open(os.path.join(journals_dir,filename), "r") as f:
+            with open(os.path.join(journals_dir,filename), "r", encoding='utf-8') as f:
                 for line in f.readlines():
                     line = line.rstrip()
                     if ";" in line and line[0] != '#':
