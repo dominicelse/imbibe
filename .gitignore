@@ -1,6 +1,7 @@
 __pycache__
 imbibe_env/
 imbibe/opts.py
+imbibe/journals
 bin/*
 !bin/.keepdir
 imbibehere.bat
