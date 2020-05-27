@@ -23,6 +23,26 @@ try:
 except FileNotFoundError:
     protected_words = []
 
+def load_journal_abbreviations():
+    abbrev = {}
+    
+    # Load journal abbreviations
+    thisfile = inspect.getfile(inspect.currentframe())
+    journals_dir = os.path.join(os.path.dirname(thisfile), "journals")
+    for filename in os.listdir(journals_dir):
+        if filename.endswith(".csv"):
+            with open(os.path.join(journals_dir,filename), "r") as f:
+                for line in f.readlines():
+                    line = line.rstrip()
+                    if ";" in line and line[0] != '#':
+                        split = line.split(";")
+                        name = split[0]
+                        name_abbrev = split[1]
+
+                        abbrev[name] = name_abbrev
+    return abbrev
+journal_abbreviations = load_journal_abbreviations()
+
 cr = habanero.Crossref(ua_string = "imbibe")
 
 def unescape_string(s):
@@ -430,7 +450,10 @@ class BibItem(object):
             printfield("archiveprefix", "arXiv")
             printfield("eprint", self.arxivid)
         if self.journal is not None:
-            printfield("journal", self.journal_short)
+            abbrevname = journal_abbreviations.get(self.journal)
+            if abbrevname is None:
+                abbrevname = self.journal
+            printfield("journal", abbrevname)
             printfield("pages", self.page)
             printfield("year", str(self.year))
 
