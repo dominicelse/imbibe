@@ -5,6 +5,7 @@ echo Setting up environment...
 SET errhnd=^|^| ^(PAUSE ^&^& EXIT /B 1^)
 
 py -3 --version >nul %errhnd%
+py -3 download_submodules.py
 mkdir imbibe_env %errhnd%
 py -3 -m venv imbibe_env %errhnd%
 call imbibe_env\Scripts\activate.bat %errhnd%
