@@ -1,6 +1,9 @@
 import subprocess
 import urllib.request
 import zipfile
+import shutil
+import sys
+import os
 
 try:
     subprocess.run(["git", "submodule", "init"])
@@ -10,9 +13,13 @@ except FileNotFoundError:
     print("from github directly.", file=sys.stderr)
 
     url = "https://github.com/JabRef/abbrv.jabref.org/archive/master.zip"
-    urllib.request.urlretrive(url, "abbrv.zip")
+    urllib.request.urlretrieve(url, "abbrv.zip")
 
-    with zipfile.ZipFile("abbrv.zip","r") as abbrv_zip:
-        abbrv_zip.exctractall()
+    try:
+        with zipfile.ZipFile("abbrv.zip","r") as abbrv_zip:
+            abbrv_zip.extractall()
+
         shutil.rmtree("abbrv.jabref.org")
         shutil.move("abbrv.jabref.org-master",  "abbrv.jabref.org")
+    finally:
+        os.remove("abbrv.zip")
