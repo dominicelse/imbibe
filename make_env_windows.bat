@@ -5,13 +5,13 @@ echo Setting up environment...
 SET errhnd=^|^| ^(PAUSE ^&^& EXIT /B 1^)
 
 py -3 --version >nul %errhnd%
-py -3 download_submodules.py
+py -3 download_submodules.py %errhnd%
 mkdir imbibe_env %errhnd%
 py -3 -m venv imbibe_env %errhnd%
 call imbibe_env\Scripts\activate.bat %errhnd%
 pip3 install wheel %errhnd%
-pip3 install arxiv habanero unidecode %errhnd%
-xcopy abbrv.jabref.org\journals imbibe_env\Lib\site-packages\imbibe\
+pip3 install arxiv habanero unidecode==1.1.1 progressbar2 bibtexparser %errhnd%
+xcopy abbrv.jabref.org\journals imbibe_env\Lib\site-packages\imbibe\journals\ %errhnd%
 xcopy imbibe imbibe_env\Lib\site-packages\imbibe\ %errhnd%
 
 echo ^@echo off >bin\imbibe.bat %errhnd%

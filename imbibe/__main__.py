@@ -43,7 +43,7 @@ def load_journal_abbreviations():
     thisfile = inspect.getfile(inspect.currentframe())
     thisdir = os.path.dirname(thisfile)
     for filename in import_order:
-        with open(os.path.join(thisdir, filename), "r") as f:
+        with open(os.path.join(thisdir, filename), "r", encoding='utf-8') as f:
             for line in f.readlines():
                 line = line.rstrip()
                 if ";" in line and line[0] != '#':
