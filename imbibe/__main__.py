@@ -25,21 +25,33 @@ except FileNotFoundError:
 
 def load_journal_abbreviations():
     abbrev = {}
-    
-    # Load journal abbreviations
-    thisfile = inspect.getfile(inspect.currentframe())
-    journals_dir = os.path.join(os.path.dirname(thisfile), "journals")
-    for filename in os.listdir(journals_dir):
-        if filename.endswith(".csv"):
-            with open(os.path.join(journals_dir,filename), "r") as f:
-                for line in f.readlines():
-                    line = line.rstrip()
-                    if ";" in line and line[0] != '#':
-                        split = line.split(";")
-                        name = split[0]
-                        name_abbrev = split[1]
 
-                        abbrev[name] = name_abbrev
+    import_order = [ 
+      'journals/journal_abbreviations_acs.csv',
+      'journals/journal_abbreviations_mathematics.csv',
+      'journals/journal_abbreviations_ams.csv',
+      'journals/journal_abbreviations_geology_physics.csv',
+      'journals/journal_abbreviations_geology_physics_variations.csv',
+      'journals/journal_abbreviations_ieee.csv',
+      'journals/journal_abbreviations_lifescience.csv',
+      'journals/journal_abbreviations_mechanical.csv',
+      'journals/journal_abbreviations_meteorology.csv',
+      'journals/journal_abbreviations_sociology.csv',
+      'journals/journal_abbreviations_general.csv',
+   ]
+    
+    thisfile = inspect.getfile(inspect.currentframe())
+    thisdir = os.path.dirname(thisfile)
+    for filename in import_order:
+        with open(os.path.join(thisdir, filename), "r") as f:
+            for line in f.readlines():
+                line = line.rstrip()
+                if ";" in line and line[0] != '#':
+                    split = line.split(";")
+                    name = split[0]
+                    name_abbrev = split[1]
+
+                    abbrev[name] = name_abbrev
     return abbrev
 journal_abbreviations = load_journal_abbreviations()
 
