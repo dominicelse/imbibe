@@ -296,6 +296,9 @@ def origcase_heuristic(title):
     else:
         return True
 
+class ValueUnknownException(Exception):
+    pass
+
 class BibItem(object):
     cache = {}
     badjournals = []
@@ -328,6 +331,12 @@ class BibItem(object):
         with open(filename, "r") as f:
             return [ line.rstrip("\n") for line in f ]
 
+    def __getattr__(self, name):
+        if name == 'aps_populated':
+            return False
+        else:
+            raise AttributeError(name)
+
     @staticmethod
     def load_cache(filename):
         try:
@@ -350,7 +359,12 @@ class BibItem(object):
     @staticmethod
     def init_from_input_file_line(line):
         if line in BibItem.cache:
-            return BibItem.cache[line]
+            cached = BibItem.cache[line]
+            try:
+                cached.is_aps()
+                return cached
+            except ValueUnknownException:
+                pass
 
         splitline = re.split(r'(?<!\\)\[|(?<!\\)\]', line)
         main = splitline[0]
@@ -413,7 +427,7 @@ class BibItem(object):
             else:
                 return self.publisher == "American Physical Society (APS)"
         except AttributeError:
-            return False
+             raise ValueUnknownException()
 
     def generate_bibtexid(self):
         if self.bibtex_id is not None:
