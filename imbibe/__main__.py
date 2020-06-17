@@ -356,15 +356,24 @@ class BibItem(object):
             json.dump(dict( (k,i.__dict__) for k,i in BibItem.cache.items()),
                     f, indent=0)
 
+    def is_fresh(self):
+        global args
+        try:
+            if self.is_aps() and not self.aps_populated:
+                return False
+            if args.refresh_eprints and not self.doi_populated:
+                return False
+            else:
+                return True
+        except ValueUnknownException:
+            return False
+
     @staticmethod
     def init_from_input_file_line(line):
         if line in BibItem.cache:
             cached = BibItem.cache[line]
-            try:
-                cached.is_aps()
+            if cached.is_fresh():
                 return cached
-            except ValueUnknownException:
-                pass
 
         splitline = re.split(r'(?<!\\)\[|(?<!\\)\]', line)
         main = splitline[0]
@@ -611,6 +620,9 @@ if __name__ == '__main__':
     parser.add_argument("--no-eprint-published", action='store_false',
             dest='eprint_published',
             help="For published papers, don't include the arXiv ID in the BibTeX file.")
+    parser.add_argument("--refresh-eprints", action='store_true',
+            dest='refresh_eprints',
+            help="Ignore cache for entries where the cached entry has no publication information.")
     parser.add_argument("--print-keys", action='store_true',
             dest='print_keys',
             help="Instead of outputting BibTeX entries, just output the BibTeX IDs, separated by commas.")
