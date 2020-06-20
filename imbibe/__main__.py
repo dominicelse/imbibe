@@ -22,6 +22,8 @@ try:
         protected_words = [ line.rstrip("\n") for line in f ]
 except FileNotFoundError:
     protected_words = []
+protected_words = set(protected_words)
+protected_words_uppercase = dict( (word.upper(),word) for word in protected_words )
 
 def load_journal_abbreviations():
     abbrev = {}
@@ -189,7 +191,11 @@ def populate_aps_information(list_of_bibitems):
         bibitem.read_aps_information(result)
 
 def format_author(auth):
-    return auth['family'] + ", " + auth['given']
+    family = auth['family']
+    given = auth['given']
+    if isallcaps(family + given):
+        family,given = (capitalize_first_letter(s.lower()) for s in (family,given))
+    return family + ", " + given
 
 def format_authorlist(l):
     if len(l) == 0:
@@ -287,6 +293,36 @@ def protect_words(title):
             split[i] = "{" + word + "}"
     return ''.join(split)
 
+def capitalize_first_letter(s):
+    if len(s) == 0:
+        return s
+    else:
+        return s[0].upper() + s[1:]
+
+def unallcapsify(title, protect, firstwordcapitalized):
+    split = re.split('([-\s])', title)
+    for i in range(len(split)):
+        word = split[i]
+        if len(word) == 0:
+            continue
+
+        if word.upper() in protected_words_uppercase:
+            word = protected_words_uppercase[word]
+            if i == 0 and firstwordcapitalized:
+                word = word[0].upper() + word[1:]
+            if protect:
+                word = "{" + word + "}"
+        else:
+            word = word.lower()
+            if i == 0 and firstwordcapitalized:
+                word = word[0].upper() + word[1:]
+        split[i] = word
+    return ''.join(split)
+
+def isallcaps(s):
+    ret = all(c.isupper() for c in s if c.isalpha())
+    return ret
+
 def origcase_heuristic(title):
     words = title.split()
     n = len(words)
@@ -354,7 +390,7 @@ class BibItem(object):
     def save_cache(filename):
         with open(filename, 'w') as f:
             json.dump(dict( (k,i.__dict__) for k,i in BibItem.cache.items()),
-                    f, indent=0)
+                    f, indent=2)
 
     def is_fresh(self):
         global args
@@ -501,12 +537,17 @@ class BibItem(object):
         if self.doi is not None:
             printfield("doi", self.doi)
 
-        origcase = origcase_heuristic(self.title)
-        title = bibtex_escape(self.title)
-        if origcase:
-            print("  title={{" + title + "}},")
+        title = self.title
+        allcaps = isallcaps(title)
+        if allcaps:
+            title = unallcapsify(title, protect=True, firstwordcapitalized=True)
         else:
-            print("  title={" + protect_words(title) + "},")
+            origcase = origcase_heuristic(title)
+            if origcase:
+                title = "{" + title + "}"
+            else:
+                title = protect_words(title)
+        print("  title={" + title + "},")
 
         try:
             extra_bibtex_fields = self.extra_bibtex_fields
