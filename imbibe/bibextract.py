@@ -62,11 +62,18 @@ def process(bibdatabase):
         print(line)
 
 if __name__ == '__main__':
-    filename = sys.argv[1]
+    if sys.argv[1] == '--delete':
+        delete = True
+        filename = sys.argv[2]
+    else:
+        delete = False
+        filename = sys.argv[1]
+
     with open(filename, 'r') as f:
         bibdatabase = bibtexparser.load(f)
 
     process(bibdatabase)
 
-    with open(filename, 'w') as f:
-        bibtexparser.dump(bibdatabase, f)
+    if delete:
+        with open(filename, 'w') as f:
+            bibtexparser.dump(bibdatabase, f)
