@@ -150,7 +150,6 @@ def crossref_find_from_journalref(journaltitle, volume, number, year, articletit
             return crossref_find_from_journalref(journaltitle, volume, number, year, articletitle,
                     titlesearchbydefault=True)
         else:
-            raise RuntimeError("not found")
             return None
     else:
         match = matches[0]
