@@ -38,7 +38,8 @@ def process_entry(entry):
     doi = match['DOI']
     arxivid = imbibe.arxiv_find_from_doi(doi)
     if arxivid is None:
-        errprint("WARNING: No arXiv ID found for DOI: " + doi)
+        if int(entry['year']) >= 1991 and not ('has_eprint' in entry and entry['has_eprint'] == 'no'):
+            errprint("WARNING: No arXiv ID found for DOI: " + doi)
         id_ = 'doi:' + doi
     else:
         id_ = arxivid
