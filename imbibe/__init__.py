@@ -11,6 +11,7 @@ import json
 import inspect
 import urllib.request
 import bibtexparser
+import titlecase
 
 try:
     from imbibe.opts import optional_bibtex_fields
@@ -126,6 +127,9 @@ def populate_arxiv_information(list_of_bibitems):
         bibitem.read_arxiv_information(result)
 
 def crossref_find_from_journalref(journaltitle, volume, number, year, articletitle=None, titlesearchbydefault=False):
+    # Weirdly Crossref search by journal seems to be case sensitive...
+    journaltitle = titlecase.titlecase(journaltitle)
+
     if titlesearchbydefault:
         assert articletitle is not None
         ret = cr.works(filter={'container-title': journaltitle,
