@@ -16,6 +16,11 @@ echo "source '$PWD/imbibe_env/bin/activate'" >>bin/imbibe
 echo 'python3 -m imbibe "$@"' >>bin/imbibe
 chmod u+x bin/imbibe
 
+echo "#!/bin/bash" >bin/imbibe_bibextract
+echo "source '$PWD/imbibe_env/bin/activate'" >>bin/imbibe_bibextract
+echo 'python3 -m imbibe.bibextract "$@"' >>bin/imbibe_bibextract
+chmod u+x bin/imbibe_bibextract
+
 # On Mac OS X, also make a simpler helper script that can be run from the
 # Finder by double-clicking.
 if [ $(uname -s) == Darwin ]; then
