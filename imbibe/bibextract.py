@@ -1,6 +1,7 @@
 import imbibe
 import bibtexparser
 import sys
+import time
 
 def errprint(*s):
     return print(*s, file=sys.stderr)
@@ -24,19 +25,26 @@ def process_entry(entry):
         return None
     if 'title' in entry:
         kwargs['articletitle'] = entry['title']
+        title = entry['title']
+    else:
+        title = None
+
+    errprint(entry['ID'])
+
     match = imbibe.crossref_find_from_journalref(**kwargs)
+    time.sleep(1)
 
     if match is None:
         print("WARNING: lookup for article with bibtex ID " + entry['ID'] + " failed.",
               file=sys.stderr)
         return None
-    elif 'title' in entry and match['title'][0].lower() != entry['title'].lower():
+    elif 'title' in entry and not imbibe.titles_equal(match['title'][0], entry['title']):
         errprint("WARNING: titles did not agree for article with bibtex ID " + entry['ID'])
         errprint("Bibtex entry has title:" + entry['title'])
         errprint("Crossref has title:" + match['title'][0])
 
     doi = match['DOI']
-    arxivid = imbibe.arxiv_find_from_doi(doi)
+    arxivid = imbibe.arxiv_find(doi, title)
     if arxivid is None:
         if int(entry['year']) >= 1991 and not ('has_eprint' in entry and entry['has_eprint'] == 'no'):
             errprint("WARNING: No arXiv ID found for DOI: " + doi)

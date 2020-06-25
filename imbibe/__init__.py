@@ -96,6 +96,16 @@ def bibtex_escape(s):
     # todo: how do we know if we removed the right bracket?
     return s
 
+
+def canonicalize_title(s):
+    subs = { "\u2009": " ", "\xa0": " " }
+    for c,rc in subs.items():
+        s = s.replace(c, rc)
+    return s.lower()
+
+def titles_equal(t1,t2):
+    return canonicalize_title(t1) == canonicalize_title(t2)
+
 def populate_arxiv_information(list_of_bibitems):
     bibitems_with_arxivid = [ b for b in list_of_bibitems if
             (b.arxivid is not None and not b.arxiv_populated) ]
@@ -145,7 +155,7 @@ def crossref_find_from_journalref(journaltitle, volume, number, year, articletit
     matches = [ match for match in matches if ('volume' in match and match['volume'] == volume) ]
 
     if titlesearchbydefault:
-        matches = [ match for match in matches if match['title'][0].lower() == articletitle.lower() ]
+        matches = [ match for match in matches if titles_equal(match['title'][0], articletitle) ]
 
     if len(matches) > 1:
         raise RuntimeError("More than one match for journal ref.")
@@ -159,17 +169,23 @@ def crossref_find_from_journalref(journaltitle, volume, number, year, articletit
         match = matches[0]
         return matches[0]
 
-def arxiv_find_from_doi(doi):
-    matches = arxiv.query(doi)
+def arxiv_find(doi, title=None, searchbytitlefirst=False):
+    if searchbytitlefirst:
+        matches = arxiv.query(title, max_results=10)
+    else:
+        matches = arxiv.query(doi, max_results=10)
+
+    matches = [ match for match in matches if match['doi'] is not None and match['doi'].lower() == doi.lower() ]
     if len(matches) == 0:
-        return None
+        if title is not None and not searchbytitlefirst:
+            return arxiv_find(doi, title, True)
+        else:
+            return None
     elif len(matches) > 1:
-        raise RuntimeError("More than one arXiv match for DOI: " + doi)
+        if doi is not None:
+            raise RuntimeError("More than one arXiv match for DOI: " + doi)
 
     match = matches[0]
-
-    if match['doi'].lower() != doi.lower():
-        raise RuntimeError("arXiv returned an entry that didn't have the right DOI.")
 
     re_m = re.search('http://arxiv.org/abs/(.+?)v[0-9]*', match['id'])
     if re_m is None:
