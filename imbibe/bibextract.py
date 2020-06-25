@@ -2,6 +2,7 @@ import imbibe
 import bibtexparser
 import sys
 import time
+import re
 
 def errprint(*s):
     return print(*s, file=sys.stderr)
@@ -11,6 +12,12 @@ def process_entry(entry):
         return None
     elif 'imbibeable' in entry and entry['imbibeable'] == 'no':
         return None
+
+    if 'journal' in entry:
+        journal = entry['journal']
+        re_m = re.search('arXiv preprint arXiv:(.+)', entry['journal'])
+        if re_m is not None:
+            return re_m.group(1)
 
     fieldtranslations = {
             'journal': 'journaltitle',
