@@ -724,6 +724,9 @@ class OpenFileWithPath:
         return getattr(self.f, attr)
 
 def main():
+    global print
+    global args
+
     parser = argparse.ArgumentParser(prog='imbibe')
     parser.add_argument("--no-eprint-published", action='store_false',
             dest='eprint_published',
