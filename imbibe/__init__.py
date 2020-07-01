@@ -3,6 +3,7 @@ import sys
 import habanero
 import re
 import os
+import os.path
 import unidecode
 import argparse
 import time
@@ -42,11 +43,16 @@ def load_journal_abbreviations():
       'journals/journal_abbreviations_sociology.csv',
       'journals/journal_abbreviations_general.csv',
    ]
-    
+
     thisfile = inspect.getfile(inspect.currentframe())
     thisdir = os.path.dirname(thisfile)
+    import_order = [ os.path.join(thisdir, filename) for filename in import_order ]
+    custom_journals_filename = "journal_abbrev.csv"
+    if os.path.exists(custom_journals_filename):
+        import_order += [ custom_journals_filename ]
+    
     for filename in import_order:
-        with open(os.path.join(thisdir, filename), "r", encoding='utf-8') as f:
+        with open(filename, "r", encoding='utf-8') as f:
             for line in f.readlines():
                 line = line.rstrip()
                 if ";" in line and line[0] != '#':
