@@ -8,7 +8,7 @@ def errprint(*s):
     return print(*s, file=sys.stderr)
 
 def process_entry(entry):
-    if entry['ENTRYTYPE'] != 'article':
+    if entry['ENTRYTYPE'] not in ('article','misc'):
         return None
     elif 'imbibeable' in entry and entry['imbibeable'] == 'no':
         return None
@@ -17,7 +17,7 @@ def process_entry(entry):
         journal = entry['journal']
         re_m = re.search('arXiv preprint arXiv:(.+)', entry['journal'])
         if re_m is not None:
-            return re_m.group(1)
+            return re_m.group(1) + ' [bibtex_id:' + entry['ID'] + ']'
 
     fieldtranslations = {
             'journal': 'journaltitle',
@@ -28,8 +28,11 @@ def process_entry(entry):
     try:
         kwargs = dict( (b, entry[a]) for (a,b) in fieldtranslations.items())
     except KeyError:
-        # Not enough information to look up journal reference.
-        return None
+        # Not enough information to look up journal reference
+        if 'eprint' in entry:
+            return entry['eprint'] + ' [bibtex_id:' + entry['ID'] + ']'
+        else:
+            return None
     if 'title' in entry:
         kwargs['articletitle'] = entry['title']
         title = entry['title']
