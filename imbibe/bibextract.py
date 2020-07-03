@@ -16,6 +16,8 @@ def process_entry(entry):
     if 'journal' in entry:
         journal = entry['journal']
         re_m = re.search('arXiv preprint arXiv:(.+)', entry['journal'])
+        if re_m is None:
+            re_m = re.search('arXiv preprint (.+)', entry['journal'])
         if re_m is not None:
             return re_m.group(1) + ' [bibtex_id:' + entry['ID'] + ']'
 
