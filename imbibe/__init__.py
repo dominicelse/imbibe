@@ -158,10 +158,15 @@ def crossref_find_from_journalref(journaltitle, volume, number, year, articletit
                                'from-pub-date': year,
                                'until-pub-date': year})
     matches = ret['message']['items']
-    matches = [ match for match in matches if ('volume' in match and match['volume'] == volume) ]
-
-    if titlesearchbydefault:
-        matches = [ match for match in matches if titles_equal(match['title'][0], articletitle) ]
+    matches = [ match for match in matches if 
+            (
+               ('volume' in match and match['volume'] == volume) and
+               ( 
+                  ('article-number' in match and match['article-number'] == number) or
+                  ('page' in match and match['page'].split('-')[0] == number)
+               )
+            )
+            ]
 
     if len(matches) > 1:
         raise RuntimeError("More than one match for journal ref.")
