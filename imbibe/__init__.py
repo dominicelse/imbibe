@@ -13,6 +13,7 @@ import inspect
 import urllib.request
 import bibtexparser
 import titlecase
+import unicodedata
 
 try:
     from imbibe.opts import optional_bibtex_fields
@@ -347,6 +348,48 @@ def make_charsubs():
     return charsubs
 charsubs = make_charsubs()
 
+def _decode_latex_accents_yielder(text):
+    if decode_latex_accents.accent_map is None:
+        # TODO: There are some cases not covered by this, e.g. \t{oo}
+        decode_latex_accents.accent_map = {
+                '`': '\u0300',
+                "'": '\u0301',
+                '^': '\u0302',
+                '"': '\u0308',
+                'H': '\u030b',
+                '~': '\u0303',
+                'c': '\u0327',
+                'k': '\u0328',
+                'l': '\u0142',
+                '=': '\u0304',
+                '.': '\u0307',
+                'd': '\u0323',
+                'r': '\u030a',
+                'c': '\u0306',
+                'v': '\u030c',
+                'o': '\u00f8',
+                '\\': '\\'
+                }
+    accent_map = decode_latex_accents.accent_map
+    i = 0
+    while i < len(text):
+        if text[i] == '\\':
+            if i >= len(text)-2:
+                yield text[i]
+            else:
+                if text[i+1] in accent_map:
+                    yield text[i+2]
+                    yield accent_map[text[i+1]]
+                    i += 2
+                else:
+                    yield text[i]
+        else:
+            yield text[i]
+        i += 1
+def decode_latex_accents(text):
+    return unicodedata.normalize('NFC', ''.join(_decode_latex_accents_yielder(text)))
+decode_latex_accents.accent_map = None
+
 def process_text(text):
     if isinstance(text, str):
         def replace(c):
@@ -366,8 +409,9 @@ def protect_words(title):
         word = split[i]
         if len(word) == 0:
             continue
-        if (sum(c.isupper() for c in word) > 1
-                or (word[0].isupper() and word in protected_words)):
+        if (word[0] == '$'
+            or sum(c.isupper() for c in word) > 1
+            or (word[0].isupper() and word in protected_words)):
             split[i] = "{" + word + "}"
     return ''.join(split)
 
@@ -659,7 +703,7 @@ class BibItem(object):
         # that contain an equation. On the other hand the APS website lets you export a
         # BibTeX entry for all their papers which does have the correct the information.
         # So we use that instead.
-        self.title = apsresult['title']
+        self.title = decode_latex_accents(apsresult['title'])
 
         self.aps_populated = True
 
