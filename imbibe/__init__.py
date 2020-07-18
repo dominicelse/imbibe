@@ -121,24 +121,16 @@ def populate_arxiv_information(list_of_bibitems):
     if len(arxiv_ids) == 0:
         return
 
-    try:
-        results = arxiv.query(id_list=arxiv_ids, max_results=len(arxiv_ids))
-    except Exception as e:
-        if e.args[0] != 'HTTP Error 400 in query':
-            raise e
-
+    results = arxiv.query(id_list=arxiv_ids, max_results=len(arxiv_ids))
+    if len(results) != len(arxiv_ids):
         # Need to try all the arXiv IDs individually to find out which one was
         # not found.
-        results = [ None ] * len(arxiv_ids)
-        for i in range(len(results)):
-            try:
-                results[i] = arxiv.query(id_list=arxiv_ids[i])[0]
-            except Exception as ee:
-                print("arXiv ID not found (or other error): " + arxiv_ids[i], file=sys.stderr)
-                raise ee from None
-
-    if len(results) != len(arxiv_ids):
-        raise RuntimeError("arXiv returned wrong number of papers.")
+        for i in range(len(arxiv_ids)):
+            ret = arxiv.query(id_list=[arxiv_ids[i]])
+            if len(ret) != 1:
+                print("arXiv ID not found:" + arxiv_ids[i], file=sys.stderr)
+                sys.exit(1)
+        assert False
 
     for bibitem,result in zip(bibitems_with_arxivid, results):
         bibitem.read_arxiv_information(result)
