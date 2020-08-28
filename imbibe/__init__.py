@@ -613,6 +613,8 @@ class BibItem(object):
         return hash(self.canonical_id)
 
     def output_bib(self, eprint_published):
+        global args
+
         if self.bibtex_id is not None:
             bibtex_id = self.bibtex_id
         else:
@@ -663,12 +665,13 @@ class BibItem(object):
                 title = protect_words(title)
         print("  title={" + title + "},")
 
-        try:
-            extra_bibtex_fields = self.extra_bibtex_fields
-        except AttributeError:
-            extra_bibtex_fields = {}
-        for key,value in extra_bibtex_fields.items():
-            printfield(key, value)
+        if not args.suppress_optional_fields:
+            try:
+                extra_bibtex_fields = self.extra_bibtex_fields
+            except AttributeError:
+                extra_bibtex_fields = {}
+            for key,value in extra_bibtex_fields.items():
+                printfield(key, value)
 
         printfield("author", format_authorlist(self.authors), lastone=True)
         print("}")
@@ -784,6 +787,9 @@ def main():
     parser.add_argument("--print-keys", action='store_true',
             dest='print_keys',
             help="Instead of outputting BibTeX entries, just output the BibTeX IDs, separated by commas.")
+    parser.add_argument("--suppress-optional-fields", action='store_true',
+            dest='suppress_optional_fields',
+            help="Don't output optional BibTeX fields such as 'comment' or 'addendum'")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--arxiv")
     group.add_argument("--doi")
