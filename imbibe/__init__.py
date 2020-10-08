@@ -28,6 +28,11 @@ except FileNotFoundError:
 protected_words = set(protected_words)
 protected_words_uppercase = dict( (word.upper(),word) for word in protected_words )
 
+def thisdir():
+    thisfile = inspect.getfile(inspect.currentframe())
+    thisdir = os.path.dirname(thisfile)
+    return thisdir
+
 def load_journal_abbreviations():
     abbrev = {}
 
@@ -45,9 +50,7 @@ def load_journal_abbreviations():
       'journals/journal_abbreviations_general.csv',
    ]
 
-    thisfile = inspect.getfile(inspect.currentframe())
-    thisdir = os.path.dirname(thisfile)
-    import_order = [ os.path.join(thisdir, filename) for filename in import_order ]
+    import_order = [ os.path.join(thisdir(), filename) for filename in import_order ]
     custom_journals_filename = "journal_abbrev.csv"
     if os.path.exists(custom_journals_filename):
         import_order += [ custom_journals_filename ]
@@ -64,6 +67,24 @@ def load_journal_abbreviations():
                     abbrev[name] = name_abbrev
     return abbrev
 journal_abbreviations = load_journal_abbreviations()
+
+def load_journal_aliases():
+    filename = os.path.join(thisdir(), 'journal_aliases.txt')
+    current_set = set()
+    aliases = dict()
+    with open(filename, "r", encoding="utf-8") as f:
+        for line in f.readlines():
+            line = line.rstrip()
+            if line == '>>' and len(current_set) > 0:
+                for name in current_set:
+                    aliases[name.lower()] = current_set
+                current_set = set()
+            else:
+                current_set.add(line)
+    if len(current_set) != 0:
+        raise RuntimeError("Syntax error in journal_aliases.txt")
+    return aliases
+journal_aliases = load_journal_aliases()
 
 cr = habanero.Crossref(ua_string = "imbibe")
 
@@ -135,7 +156,21 @@ def populate_arxiv_information(list_of_bibitems):
     for bibitem,result in zip(bibitems_with_arxivid, results):
         bibitem.read_arxiv_information(result)
 
-def crossref_find_from_journalref(journaltitle, volume, number, year, articletitle=None, titlesearchbydefault=False):
+def crossref_find_from_journalref(journaltitle, volume, number, year, articletitle=None, titlesearchbydefault=False, check_aliases=True):
+    if check_aliases:
+        lower = journaltitle.lower()
+        try:
+            aliases = journal_aliases[lower]
+        except KeyError:
+            aliases = [journaltitle]
+        for alias in aliases:
+            ret = crossref_find_from_journalref(
+                    alias, volume, number, year, articletitle, titlesearchbydefault,
+                    check_aliases=False)
+            if ret is not None:
+                return ret
+        return None
+
     # Weirdly Crossref search by journal seems to be case sensitive...
     journaltitle = titlecase.titlecase(journaltitle)
 
@@ -166,7 +201,8 @@ def crossref_find_from_journalref(journaltitle, volume, number, year, articletit
     elif len(matches) == 0:
         if articletitle is not None and not titlesearchbydefault:
             return crossref_find_from_journalref(journaltitle, volume, number, year, articletitle,
-                    titlesearchbydefault=True)
+                    titlesearchbydefault=True,
+                    check_aliases=check_aliases)
         else:
             return None
     else:
