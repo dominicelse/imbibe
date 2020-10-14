@@ -177,17 +177,21 @@ def crossref_find_from_journalref(journaltitle, volume, number, year, articletit
     if titlesearchbydefault:
         assert articletitle is not None
         ret = cr.works(filter={'container-title': journaltitle,
-                               'from-pub-date': year,
+                               'from-pub-date': str(int(year)-1),
                                'until-pub-date': year},
                        query_bibliographic=articletitle)
     else:
         ret = cr.works(filter={'article-number': number, 
                                'container-title': journaltitle,
-                               'from-pub-date': year,
+                               'from-pub-date': str(int(year)-1),
                                'until-pub-date': year})
     matches = ret['message']['items']
     matches = [ match for match in matches if 
             (
+               (
+                   ('issued' in match and match['issued']['date-parts'][0][0] == int(year))
+                   or ('published-print' in match and match['published-print']['date-parts'][0][0] == int(year))
+               ) and
                ('volume' in match and match['volume'] == volume) and
                ( 
                   ('article-number' in match and match['article-number'] == number) or
