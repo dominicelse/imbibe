@@ -410,9 +410,19 @@ def _decode_latex_accents_yielder(text):
                 yield text[i]
             else:
                 if text[i+1] in accent_map:
-                    yield text[i+2]
-                    yield accent_map[text[i+1]]
-                    i += 2
+                    if i >= len(text)-4 and text[i+2] == '{' and text[i+4] == '}':
+                        yield text[i+3]
+                        yield accent_map[text[i+1]]
+                        i += 4
+                    else:
+                        # The LaTeX parsing rules seem to be a little different depending on whether the 
+                        # accent character is an alphabetic character or not.
+                        if not text[i+1].isalpha():
+                            yield text[i+2]
+                            yield accent_map[text[i+1]]
+                            i += 2
+                        else:
+                            yield text[i]
                 else:
                     yield text[i]
         else:
@@ -436,16 +446,28 @@ def process_text(text):
 
 
 def protect_words(title):
-    split = re.split("([-\s`'])", title)
-    for i in range(len(split)):
-        word = split[i]
-        if len(word) == 0:
-            continue
-        if (word[0] == '$'
-            or sum(c.isupper() for c in word) > 1
-            or (word[0].isupper() and word in protected_words)):
-            split[i] = "{" + word + "}"
-    return ''.join(split)
+    def protect_words_base(title):
+        split = re.split("([-\s`'])", title)
+        for i in range(len(split)):
+            word = split[i]
+            if len(word) == 0:
+                continue
+            if (sum(c.isupper() for c in word) > 1
+                or (word[0].isupper() and word in protected_words)):
+                split[i] = "{" + word + "}"
+        return ''.join(split)
+
+    # Don't process equations.
+    eqnsplit = title.split('$')
+    s = ''
+    ineqn = True
+    for i in range(len(eqnsplit)):
+        ineqn = not ineqn
+        if ineqn:
+            eqnsplit[i] = '{$' + eqnsplit[i] + '$}'
+        else:
+            eqnsplit[i] = protect_words_base(eqnsplit[i])
+    return ''.join(eqnsplit)
 
 def capitalize_first_letter(s):
     if len(s) == 0:
