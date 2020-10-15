@@ -790,16 +790,17 @@ class BibItem(object):
             crossref_type = cr_result['type']
             if crossref_type != "journal-article":
                 self.bad_type_exit(crossref_type)
-            self.detailed_authors = cr_result['author']
-            self.authors = [ format_author(auth) for auth in self.detailed_authors ]
+
             self.journal = cr_result['container-title'][0]
-            self.publisher = cr_result['publisher']
             if self.journal in BibItem.badjournals:
                 self.bad_journal_exit(self.journal)
             try:
                 self.journal_short = cr_result['short-container-title'][0]
             except IndexError:
                 self.journal_short = self.journal
+            self.detailed_authors = cr_result['author']
+            self.authors = [ format_author(auth) for auth in self.detailed_authors ]
+            self.publisher = cr_result['publisher']
             self.year = cr_result['issued']['date-parts'][0][0]
             self.title = cr_result['title'][0]
 
