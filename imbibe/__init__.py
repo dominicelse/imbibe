@@ -849,6 +849,9 @@ def main():
     parser.add_argument("--print-keys", action='store_true',
             dest='print_keys',
             help="Instead of outputting BibTeX entries, just output the BibTeX IDs, separated by commas.")
+    parser.add_argument("--print-eprints", action='store_true',
+            dest='print_eprints',
+            help="Instead of outputting BibTeX entries, just output the arXiv IDs of papers that have no published version.")
     parser.add_argument("--suppress-optional-fields", action='store_true',
             dest='suppress_optional_fields',
             help="Don't output optional BibTeX fields such as 'comment' or 'addendum'")
@@ -898,7 +901,11 @@ def main():
         populate_doi_information(bibitems)
         populate_aps_information(bibitems)
 
-        if args.print_keys:
+        if args.print_eprints:
+            for bibitem in bibitems:
+                if bibitem.doi is None:
+                    print(bibitem.arxivid)
+        elif args.print_keys:
             for bibitem in bibitems:
                 print(bibitem.generate_bibtexid(), end=", ")
             print()
