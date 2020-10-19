@@ -180,6 +180,10 @@ def crossref_find_from_journalref(journaltitle, volume, number, year, articletit
                                'from-pub-date': str(int(year)-1),
                                'until-pub-date': year},
                        query_bibliographic=articletitle)
+        if len(ret['message']['items']) == 0:
+            ret = cr.works(filter={'from-pub-date': str(int(year)-1),
+                                   'until-pub-date': year},
+                           query_bibliographic=articletitle)
     else:
         ret = cr.works(filter={'article-number': number, 
                                'container-title': journaltitle,
@@ -196,6 +200,10 @@ def crossref_find_from_journalref(journaltitle, volume, number, year, articletit
                ( 
                   ('article-number' in match and match['article-number'] == number) or
                   ('page' in match and match['page'].split('-')[0] == number.split('-')[0])
+               ) and
+               (
+                   ('container-title' in match and match['container-title'][0] == journaltitle) or
+                   ('short-container-title' in match and match['short-container-title'][0] == journaltitle)
                )
             )
             ]
