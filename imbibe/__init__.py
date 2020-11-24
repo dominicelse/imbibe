@@ -706,6 +706,8 @@ class BibItem(object):
         if self.arxivid is not None and (self.doi is None or eprint_published):
             printfield("archiveprefix", "arXiv")
             printfield("eprint", self.arxivid)
+        if self.arxivid is not None and self.doi is None and args.eprint_as_note:
+            printfield("note", "arXiv eprint " + self.arxivid)
         if self.journal is not None:
             abbrevname = journal_abbreviations.get(self.journal)
             if abbrevname is None:
@@ -855,6 +857,9 @@ def main():
     parser.add_argument("--refresh-eprints", action='store_true',
             dest='refresh_eprints',
             help="Ignore cache for entries where the cached entry has no publication information.")
+    parser.add_argument("--eprint-as-note", action='store_true',
+            dest='eprint_as_note',
+            help="For entries that have no published journal information, put arXiv information in the note field.")
     parser.add_argument("--print-keys", action='store_true',
             dest='print_keys',
             help="Instead of outputting BibTeX entries, just output the BibTeX IDs, separated by commas.")
