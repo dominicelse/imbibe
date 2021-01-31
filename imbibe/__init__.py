@@ -388,29 +388,29 @@ def make_charsubs():
     return charsubs
 charsubs = make_charsubs()
 
+# TODO: There are some cases not covered by this, e.g. \t{oo}
+accent_map = {
+        '`': '\u0300',
+        "'": '\u0301',
+        '^': '\u0302',
+        '"': '\u0308',
+        'H': '\u030b',
+        '~': '\u0303',
+        'c': '\u0327',
+        'k': '\u0328',
+        'l': '\u0142',
+        '=': '\u0304',
+        '.': '\u0307',
+        'd': '\u0323',
+        'r': '\u030a',
+        'c': '\u0306',
+        'v': '\u030c',
+        'o': '\u00f8'
+        }
+accent_map_reversed = { v: k for k, v in accent_map.items() }
+accent_map['\\'] = '\\'
+
 def _decode_latex_accents_yielder(text):
-    if decode_latex_accents.accent_map is None:
-        # TODO: There are some cases not covered by this, e.g. \t{oo}
-        decode_latex_accents.accent_map = {
-                '`': '\u0300',
-                "'": '\u0301',
-                '^': '\u0302',
-                '"': '\u0308',
-                'H': '\u030b',
-                '~': '\u0303',
-                'c': '\u0327',
-                'k': '\u0328',
-                'l': '\u0142',
-                '=': '\u0304',
-                '.': '\u0307',
-                'd': '\u0323',
-                'r': '\u030a',
-                'c': '\u0306',
-                'v': '\u030c',
-                'o': '\u00f8',
-                '\\': '\\'
-                }
-    accent_map = decode_latex_accents.accent_map
     i = 0
     while i < len(text):
         if text[i] == '\\':
@@ -438,7 +438,24 @@ def _decode_latex_accents_yielder(text):
         i += 1
 def decode_latex_accents(text):
     return unicodedata.normalize('NFC', ''.join(_decode_latex_accents_yielder(text)))
-decode_latex_accents.accent_map = None
+
+def _encode_latex_accents_yielder(text):
+    i = 0
+    while i < len(text):
+        if i >= len(text)-1 or text[i+1] not in accent_map_reversed:
+            yield text[i]
+            i += 1
+        else:
+            yield '\\'
+            yield accent_map_reversed[text[i+1]]
+            yield '{'
+            yield text[i]
+            yield '}'
+            i += 2
+
+def encode_latex_accents(text):
+    text = unicodedata.normalize('NFD', text)
+    return ''.join(_encode_latex_accents_yielder(text))
 
 def process_text(text):
     if isinstance(text, str):
@@ -448,7 +465,10 @@ def process_text(text):
             else:
                 return c
 
-        return "".join(replace(c) for c in text)
+        ret = "".join(replace(c) for c in text)
+        if args.bibtex_encoding:
+            ret = encode_latex_accents(ret)
+        return ret
     else:
         return text
 
@@ -849,6 +869,7 @@ class OpenFileWithPath:
 def main():
     global print
     global args
+    global print_
 
     parser = argparse.ArgumentParser(prog='imbibe')
     parser.add_argument("--no-eprint-published", action='store_false',
@@ -869,6 +890,9 @@ def main():
     parser.add_argument("--suppress-optional-fields", action='store_true',
             dest='suppress_optional_fields',
             help="Don't output optional BibTeX fields such as 'comment' or 'addendum'")
+    parser.add_argument("--bibtex-encoding", action='store_true',
+            dest='bibtex_encoding',
+            help="Where possible, convert accented characters to a LaTeX escaped character.")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--arxiv")
     group.add_argument("--doi")
