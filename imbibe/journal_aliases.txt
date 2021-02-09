@@ -1,6 +1,6 @@
 Europhysics Letters (EPL)
 EPL (Europhysics Letters)
 >>
-foo
-bar
+PNAS
+Proceedings of the National Academy of Sciences
 >>
