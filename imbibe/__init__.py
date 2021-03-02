@@ -199,7 +199,7 @@ def crossref_find_from_journalref(journaltitle, volume, number, year, articletit
                ('volume' in match and match['volume'] == volume) and
                ( 
                   ('article-number' in match and match['article-number'] == number) or
-                  ('page' in match and match['page'].split('-')[0] == number.split('-')[0])
+                  ('page' in match and match['page'].split('-')[0] == number.replace(' ','').split('-')[0])
                ) and
                (
                    ('container-title' in match and match['container-title'][0] == journaltitle) or
