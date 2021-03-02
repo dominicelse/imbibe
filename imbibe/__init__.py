@@ -340,7 +340,8 @@ def make_bibtexid_from_arxivid(firstauthorlastname, arxivid):
 def make_charsubs():
     # Some character substitutions to deal with Unicode characters that LaTeX tends to choke on.
     charsubs = { "\u2009" : " " ,
-             "\u2212" : "--" }
+             "\u2212" : "--",
+             "\u00B0" : "$^{\circ}$" }
 
     # This leaves out the letters which look identical to Roman
     # letters and don't have their own LaTeX codes.
