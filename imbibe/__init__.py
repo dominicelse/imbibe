@@ -481,8 +481,9 @@ def protect_words(title):
             word = split[i]
             if len(word) == 0:
                 continue
-            if (sum(c.isupper() for c in word) > 1
-                or (word[0].isupper() and word in protected_words)):
+            nupper = sum(c.isupper() for c in word)
+            if (nupper > 1 or 
+                    (nupper == 1 and word in protected_words)):
                 split[i] = "{" + word + "}"
         return ''.join(split)
 
@@ -791,7 +792,20 @@ class BibItem(object):
         # that contain an equation. On the other hand the APS website lets you export a
         # BibTeX entry for all their papers which does have the correct the information.
         # So we use that instead.
-        self.title = decode_latex_accents(apsresult['title'])
+        
+        aps_title = apsresult['title']
+        if '$' in aps_title:
+            if r'\ifmmode' not in aps_title:
+                self.title = decode_latex_accents(aps_title)
+            else:
+                # Sometimes (but not always) APS inserts some weird Latex macros when 
+                # the title contains accented characters, which breaks our Latex decoding.
+                # So in this case we just don't bother.
+                self.title = aps_title
+        else:
+            # The Crossref title should be fine as long as the APS title
+            # didn't contain any equations.
+            pass
 
         self.aps_populated = True
 
