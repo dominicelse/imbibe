@@ -142,12 +142,12 @@ def populate_arxiv_information(list_of_bibitems):
     if len(arxiv_ids) == 0:
         return
 
-    results = arxiv.query(id_list=arxiv_ids, max_results=len(arxiv_ids))
+    results = list(arxiv.Search(id_list=arxiv_ids, max_results=len(arxiv_ids)).results())
     if len(results) != len(arxiv_ids):
         # Need to try all the arXiv IDs individually to find out which one was
         # not found.
         for i in range(len(arxiv_ids)):
-            ret = arxiv.query(id_list=[arxiv_ids[i]])
+            ret = list(arxiv.Search(id_list=[arxiv_ids[i]]).results())
             if len(ret) != 1:
                 print("arXiv ID not found:" + arxiv_ids[i], file=sys.stderr)
                 sys.exit(1)
@@ -223,11 +223,11 @@ def crossref_find_from_journalref(journaltitle, volume, number, year, articletit
 
 def arxiv_find(doi, title=None, searchbytitlefirst=False):
     if searchbytitlefirst:
-        matches = arxiv.query(title, max_results=10)
+        matches = arxiv.Search(query=title, max_results=10).results()
     else:
-        matches = arxiv.query(doi, max_results=10)
+        matches = arxiv.Search(query=doi, max_results=10).results()
 
-    matches = [ match for match in matches if match['doi'] is not None and match['doi'].lower() == doi.lower() ]
+    matches = [ match for match in matches if match.doi is not None and match.doi.lower() == doi.lower() ]
     if len(matches) == 0:
         if title is not None and not searchbytitlefirst:
             return arxiv_find(doi, title, True)
@@ -772,18 +772,18 @@ class BibItem(object):
         print("")
 
     def read_arxiv_information(self,arxivresult):
-        self.authors = arxivresult['authors']
-        self.title = arxivresult['title']
-        self.abstract = arxivresult['summary']
+        self.authors = arxivresult.authors
+        self.title = arxivresult.title
+        self.abstract = arxivresult.summary
 
-        if self.doi is not None and arxivresult['doi'] is not None and self.doi != arxivresult['doi']:
+        if self.doi is not None and arxivresult.doi is not None and self.doi != arxivresult.doi:
             print("WARNING: manually specified DOI for arXiv:" + self.arxivid + " disagrees with arXiv information.", file=sys.stderr)
             print("You have: ", file=sys.stderr)
-            print("arXiv has: " + arxivresult['doi'], file=sys.stderr)
+            print("arXiv has: " + arxivresult.doi, file=sys.stderr)
             print("Using your DOI.", file=sys.stderr)
             print(file=sys.stderr)
-        elif arxivresult['doi'] is not None:
-            self.doi = arxivresult['doi']
+        elif arxivresult.doi is not None:
+            self.doi = arxivresult.doi
 
         self.arxiv_populated = True
 
