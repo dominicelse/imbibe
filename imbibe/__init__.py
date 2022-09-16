@@ -772,7 +772,7 @@ class BibItem(object):
         print("")
 
     def read_arxiv_information(self,arxivresult):
-        self.authors = arxivresult.authors
+        self.authors = [ str(author) for author in arxivresult.authors ]
         self.title = arxivresult.title
         self.abstract = arxivresult.summary
 
