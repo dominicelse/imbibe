@@ -1,1 +1,1 @@
-optional_bibtex_fields = [ 'addendum', 'options', 'shorthand' ]
+optional_bibtex_fields = [ 'addendum', 'options', 'shorthand', 'keywords' ]
