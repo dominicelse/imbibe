@@ -547,13 +547,19 @@ def crossref_title_to_latex(s):
     out = StringIO()
     root = etree.fromstring("<root>" + s + "</root>")
     for x in root.iter():
-        if x.tag in ('i','b','root'):
-            out.write(x.text)
-        elif x.tag == 'sub':
-            out.write(r'\textsubscript{' + x.text + '}')
-        elif x.tag == 'sup':
-            out.write(r'\textsuperscript{' + x.text + '}')
+        if x.text is not None:
+            text = x.text
         else:
+            text = ''
+
+        if x.tag in ('i','b','root'):
+            out.write(text)
+        elif x.tag == 'sub':
+            out.write(r'\textsubscript{' + text + '}')
+        elif x.tag == 'sup':
+            out.write(r'\textsuperscript{' + text + '}')
+        else:
+            out.write(r'\textsuperscript{' + text + '}')
             print("WARNING: Unsupported markup in title: <" + x.tag + ">", file=sys.stderr)
         if x.tail is not None:
             out.write(x.tail)
