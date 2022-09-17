@@ -541,6 +541,43 @@ def origcase_heuristic(title):
 class ValueUnknownException(Exception):
     pass
 
+def html2latex(s):
+    print("HTML to LaTeX conversion not implemented yet.", file=sys.stderr)
+    return s
+
+def default_fn_for_json_encoding(obj):
+    if isinstance(obj, LatexTitle):
+        return {'titletype': 'latex', 'title': obj.title}
+    elif isinstance(obj, CrossrefTitle):
+        return {'titletype': 'crossref', 'title': obj.title}
+    else:
+        return obj
+
+def object_hook_for_json_decoding(d):
+    if 'titletype' in d:
+        if d['titletype'] == 'latex':
+            return LatexTitle(d['title'])
+        elif d['titletype'] == 'crossref':
+            return CrossrefTitle(d['title'])
+        else:
+            raise NotImplementedError
+    else:
+        return d
+
+class LatexTitle(object):
+    def __init__(self, title):
+        self.title = title
+
+    def to_latex(self):
+        return self.title
+
+class CrossrefTitle(object):
+    def __init__(self, title):
+        self.title = title
+
+    def to_latex(self):
+        return html2latex(self.title)
+
 class BibItem(object):
     cache = {}
     badjournals = []
@@ -562,6 +599,7 @@ class BibItem(object):
         self.abstract = None
         self.comment = None
         self.publisher = None
+        self.title = []
 
         self.arxiv_populated = False
         self.doi_populated = False
@@ -588,7 +626,8 @@ class BibItem(object):
                     obj.__dict__ = d
                     return obj
 
-                BibItem.cache = dict( (k, init_from_dict(obj)) for k,obj in json.load(f).items())
+                BibItem.cache = dict( (k, init_from_dict(obj)) for k,obj in 
+                        json.load(f, object_hook=object_hook_for_json_decoding).items())
         except FileNotFoundError:
             print("Warning: cache file not found.", file=sys.stderr)
 
@@ -596,7 +635,7 @@ class BibItem(object):
     def save_cache(filename):
         with open(filename, 'w') as f:
             json.dump(dict( (k,i.__dict__) for k,i in BibItem.cache.items()),
-                    f, indent=2)
+                    f, indent=2, default=default_fn_for_json_encoding)
 
     def is_fresh(self):
         global args
@@ -743,11 +782,16 @@ class BibItem(object):
                 printfield("volume", self.volume)
             elif not self.suppress_volumewarning:
                 print("WARNING: No volume in CrossRef data for paper:", file=sys.stderr)
-                print("   " + self.title, file=sys.stderr)
+                print("   " + str(self.title), file=sys.stderr)
         if self.doi is not None:
             printfield("doi", self.doi)
 
-        title = self.title
+        # Compatibility for old cache files
+        if isinstance(self.title, str):
+            title = self.title
+        else:
+            title = self.title[-1].to_latex()
+
         allcaps = isallcaps(title)
         if allcaps:
             title = unallcapsify(title, protect=True, firstwordcapitalized=True)
@@ -773,7 +817,7 @@ class BibItem(object):
 
     def read_arxiv_information(self,arxivresult):
         self.authors = [ str(author) for author in arxivresult.authors ]
-        self.title = arxivresult.title
+        self.title.append(LatexTitle(arxivresult.title))
         self.abstract = arxivresult.summary
 
         if self.doi is not None and arxivresult.doi is not None and self.doi != arxivresult.doi:
@@ -795,7 +839,7 @@ class BibItem(object):
         
         aps_title = apsresult['title']
         if '$' in aps_title:
-            self.title = aps_title
+            self.title.append(LatexTitle(aps_title))
         else:
             # The Crossref title should be fine as long as the APS title
             # didn't contain any equations.
@@ -841,7 +885,7 @@ class BibItem(object):
             self.authors = [ format_author(auth) for auth in self.detailed_authors ]
             self.publisher = cr_result['publisher']
             self.year = cr_result['issued']['date-parts'][0][0]
-            self.title = cr_result['title'][0]
+            self.title.append(CrossrefTitle(cr_result['title'][0]))
 
             try:
                 self.volume = cr_result['volume']
