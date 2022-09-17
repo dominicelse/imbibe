@@ -14,6 +14,8 @@ import urllib.request
 import bibtexparser
 import titlecase
 import unicodedata
+from lxml import etree
+from io import StringIO
 
 try:
     from imbibe.opts import optional_bibtex_fields
@@ -541,9 +543,22 @@ def origcase_heuristic(title):
 class ValueUnknownException(Exception):
     pass
 
-def html2latex(s):
-    print("HTML to LaTeX conversion not implemented yet.", file=sys.stderr)
-    return s
+def crossref_title_to_latex(s):
+    out = StringIO()
+    root = etree.fromstring("<root>" + s + "</root>")
+    for x in root.iter():
+        if x.tag in ('i','b','root'):
+            out.write(x.text)
+        elif x.tag == 'sub':
+            out.write(r'\textsubscript{' + x.text + '}')
+        elif x.tag == 'sup':
+            out.write(r'\textsuperscript{' + x.text + '}')
+        else:
+            print("WARNING: Unsupported markup in title: <" + x.tag + ">", file=sys.stderr)
+        if x.tail is not None:
+            out.write(x.tail)
+
+    return out.getvalue()
 
 def default_fn_for_json_encoding(obj):
     if isinstance(obj, LatexTitle):
@@ -576,7 +591,7 @@ class CrossrefTitle(object):
         self.title = title
 
     def to_latex(self):
-        return html2latex(self.title)
+        return crossref_title_to_latex(self.title)
 
 class BibItem(object):
     cache = {}

@@ -9,7 +9,7 @@ mkdir imbibe_env %errhnd%
 py -3 -m venv imbibe_env %errhnd%
 call imbibe_env\Scripts\activate.bat %errhnd%
 pip3 install wheel %errhnd%
-pip3 install arxiv habanero unidecode==1.1.1 progressbar2 bibtexparser titlecase %errhnd%
+pip3 install arxiv habanero unidecode==1.1.1 progressbar2 bibtexparser titlecase lxml %errhnd%
 mklink /j imbibe\journals abbrv.jabref.org\journals %errhnd%
 mklink /j imbibe_env\Lib\site-packages\imbibe imbibe %errhnd%
 
