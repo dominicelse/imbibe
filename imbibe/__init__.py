@@ -795,13 +795,7 @@ class BibItem(object):
         
         aps_title = apsresult['title']
         if '$' in aps_title:
-            if r'\ifmmode' not in aps_title:
-                self.title = decode_latex_accents(aps_title)
-            else:
-                # Sometimes (but not always) APS inserts some weird Latex macros when 
-                # the title contains accented characters, which breaks our Latex decoding.
-                # So in this case we just don't bother.
-                self.title = aps_title
+            self.title = aps_title
         else:
             # The Crossref title should be fine as long as the APS title
             # didn't contain any equations.
