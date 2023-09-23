@@ -782,7 +782,13 @@ class BibItem(object):
             print("  " + field + "={" + bibtex_escape(value) + "}" +
                     ("" if lastone else ","))
 
-        print("@article{" + self.generate_bibtexid() + ",")
+        
+        if self.journal is not None:
+            bibtex_type="article"
+        else:
+            bibtex_type="unpublished"
+
+        print("@" + bibtex_type + "{" + self.generate_bibtexid() + ",")
         if self.abstract is not None:
             printfield("abstract", self.abstract)
         if self.arxivid is not None and (self.doi is None or eprint_published):
