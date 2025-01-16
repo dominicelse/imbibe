@@ -731,14 +731,19 @@ class BibItem(object):
         BibItem.cache[line] = bibitem
         return bibitem
 
+    # def is_aps(self):
+    #     try:
+    #         if self.publisher is None:
+    #             return False
+    #         else:
+    #             return self.publisher == "American Physical Society (APS)"
+    #     except AttributeError:
+    #          raise ValueUnknownException()
+
     def is_aps(self):
-        try:
-            if self.publisher is None:
-                return False
-            else:
-                return self.publisher == "American Physical Society (APS)"
-        except AttributeError:
-             raise ValueUnknownException()
+        # APS has started blocking bots from accessing its data, so we have to fall back to
+        # CrossRef for all papers.
+        return False
 
     def generate_bibtexid(self):
         if self.bibtex_id is not None:
