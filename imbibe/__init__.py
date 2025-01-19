@@ -4,6 +4,7 @@ import habanero
 import re
 import os
 import os.path
+import html
 import unidecode
 import argparse
 import time
@@ -906,7 +907,7 @@ class BibItem(object):
             if crossref_type != "journal-article":
                 self.bad_type_exit(crossref_type)
 
-            self.journal = cr_result['container-title'][0]
+            self.journal = html.unescape(cr_result['container-title'][0])
             if self.journal in BibItem.badjournals:
                 self.bad_journal_exit(self.journal)
             try:
