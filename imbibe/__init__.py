@@ -344,7 +344,7 @@ def make_charsubs():
     # Some character substitutions to deal with Unicode characters that LaTeX tends to choke on.
     charsubs = { "\u2009" : " " ,
              "\u2212" : "--",
-             "\u00B0" : "$^{\circ}$" }
+             "\u00B0" : r"$^{\circ}$" }
 
     # This leaves out the letters which look identical to Roman
     # letters and don't have their own LaTeX codes.
@@ -479,7 +479,7 @@ def process_text(text):
 
 def protect_words(title):
     def protect_words_base(title):
-        split = re.split("([-\s`'])", title)
+        split = re.split(r"([-\s`'])", title)
         for i in range(len(split)):
             word = split[i]
             if len(word) == 0:
@@ -509,7 +509,7 @@ def capitalize_first_letter(s):
         return s[0].upper() + s[1:]
 
 def unallcapsify(title, protect, firstwordcapitalized):
-    split = re.split('([-\s])', title)
+    split = re.split(r'([-\s])', title)
     for i in range(len(split)):
         word = split[i]
         if len(word) == 0:
